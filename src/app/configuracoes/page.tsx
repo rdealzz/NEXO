@@ -1,14 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { PainelAssinatura } from "@/components/assinatura/painel-assinatura";
-import { ExcluirConta } from "@/components/legal/excluir-conta";
-import { AtivarAvisos } from "@/components/permissoes/avisos";
 import { Botao } from "@/components/ui/button";
-import { acessoDe } from "@/lib/assinatura/acesso";
-import { asaasConfigurado } from "@/lib/assinatura/asaas";
 import { MarcaNexo } from "@/components/ui/logo";
-import { EscolhaTema } from "@/components/ui/tema";
 import { sendText, whatsappConfigured } from "@/lib/inbound/whatsapp";
 import { confirmPhoneLink, ensureProfile, inboundAddress, startPhoneLink } from "@/lib/profile";
 import { currentUser, supabaseServer } from "@/lib/supabase/server";
@@ -60,7 +54,6 @@ export default async function ConfiguracoesPage({
   if (!user) redirect("/entrar");
 
   const profile = await ensureProfile(user.id, user.email);
-  const acesso = await acessoDe(user.id);
   const endereco = inboundAddress(profile);
 
   return (
@@ -74,34 +67,18 @@ export default async function ConfiguracoesPage({
         </Link>
       </header>
 
-      <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
-      <p className="mt-1 text-sm text-muted">{user.email}</p>
+      <h1 className="text-2xl font-semibold tracking-tight">Canais de entrada</h1>
+      <p className="mt-1 text-sm text-muted">
+        Por onde o material chega sem você abrir o app.{" "}
+        <Link href="/perfil" className="text-accent underline underline-offset-4">
+          Ir para o perfil
+        </Link>
+      </p>
 
       {erro && <p className="mt-4 text-sm text-[#e0483a]">{MENSAGENS[erro] ?? "Algo deu errado."}</p>}
       {vinculado && <p className="mt-4 text-sm text-accent">Telefone vinculado. Pode me mandar coisas por lá.</p>}
 
       <section className="mt-8 rounded-2xl border border-line bg-surface p-4">
-        <h2 className="text-sm font-semibold">Assinatura</h2>
-        <PainelAssinatura acesso={acesso} disponivel={asaasConfigurado()} />
-      </section>
-
-      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
-        <h2 className="text-sm font-semibold">Avisos</h2>
-        <p className="mt-1 text-sm text-muted">
-          É por aqui que o NEXO cumpre a promessa: o aviso chega no aparelho mesmo com o app fechado.
-        </p>
-        <AtivarAvisos chavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
-      </section>
-
-      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
-        <h2 className="text-sm font-semibold">Aparência</h2>
-        <p className="mt-1 text-sm text-muted">
-          O NEXO abre no claro. O escuro fica valendo em todo acesso, neste aparelho.
-        </p>
-        <EscolhaTema />
-      </section>
-
-      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
         <h2 className="text-sm font-semibold">Seu endereço de entrada</h2>
         <p className="mt-1 text-sm text-muted">
           Encaminhe qualquer e-mail para cá e eu leio. Só aceito mensagens vindas do seu próprio e-mail.
@@ -154,39 +131,6 @@ export default async function ConfiguracoesPage({
         <p className="mt-2 text-xs text-muted">
           Mando um código para o número antes de ativar — assim ninguém aponta o seu WhatsApp para outra conta.
         </p>
-      </section>
-
-      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
-        <h2 className="text-sm font-semibold">Sobre e legal</h2>
-        <p className="mt-1 text-sm text-muted">
-          O que você aceita ao usar o NEXO, e o que fazemos com o que você manda.
-        </p>
-        <div className="mt-3 divide-y divide-line">
-          <Link href="/legal/termos" className="flex items-center justify-between py-2.5 text-sm hover:text-accent">
-            Termos de Uso <span aria-hidden className="text-muted">›</span>
-          </Link>
-          <Link
-            href="/legal/privacidade"
-            className="flex items-center justify-between py-2.5 text-sm hover:text-accent"
-          >
-            Política de Privacidade <span aria-hidden className="text-muted">›</span>
-          </Link>
-        </div>
-        <p className="mt-3 rounded-xl bg-accent-soft px-3 py-2 text-xs leading-snug text-accent">
-          Seus dados pessoais não treinam nenhuma inteligência artificial. O conteúdo que você manda é lido para
-          criar o lembrete e nada além disso.
-        </p>
-      </section>
-
-      <section className="mt-4 rounded-2xl border border-danger/30 bg-surface p-4">
-        <h2 className="text-sm font-semibold">Excluir minha conta</h2>
-        <p className="mt-1 text-sm text-muted">
-          Apaga permanentemente lembretes, capturas, arquivos, compras e o login. É definitivo — não guardamos
-          cópia.
-        </p>
-        <div className="mt-3">
-          <ExcluirConta email={user.email} />
-        </div>
       </section>
 
       <form action={sair} className="mt-8">

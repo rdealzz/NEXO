@@ -3,11 +3,11 @@ import Link from "next/link";
 import { InboxClient } from "@/components/inbox-client";
 import { PainelNotificacoes } from "@/components/notificacoes/painel";
 import { AtivarAvisos } from "@/components/permissoes/avisos";
-import { MarcaNexo } from "@/components/ui/logo";
+import { ChipPerfil } from "@/components/perfil/chip";
 import { AlternadorTema } from "@/components/ui/tema";
 import { store } from "@/lib/db";
 import { currentOwner } from "@/lib/owner";
-import { ensureProfile } from "@/lib/profile";
+import { ensureProfile, primeiroNome } from "@/lib/profile";
 
 export const dynamic = "force-dynamic";
 
@@ -19,32 +19,23 @@ export default async function InboxPage({
   const { migrados } = await searchParams;
   const owner = await currentOwner();
   const reminders = owner.isNew ? [] : await store().listReminders(owner.id);
-  if (owner.authenticated) await ensureProfile(owner.id, owner.email);
+  const perfil = owner.authenticated ? await ensureProfile(owner.id, owner.email) : null;
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:py-10">
       <header className="mb-6 flex items-baseline justify-between gap-3">
-        <div>
-          <Link href="/" aria-label="NEXO">
-            <MarcaNexo />
-          </Link>
-          <p className="text-sm text-muted">Joga aqui. Eu lembro.</p>
-        </div>
+        <ChipPerfil
+          nome={perfil ? primeiroNome(perfil) : ""}
+          avatarId={perfil?.avatar_id ?? null}
+          semente={owner.id}
+          autenticado={owner.authenticated}
+        />
         <div className="flex shrink-0 items-center gap-3">
           <Link href="/calendario" className="text-sm text-muted hover:text-foreground">
             Calendário
           </Link>
           <PainelNotificacoes reminders={reminders} />
           <AlternadorTema />
-          {owner.authenticated ? (
-            <Link href="/configuracoes" className="text-sm text-muted hover:text-foreground">
-              Configurações
-            </Link>
-          ) : (
-            <Link href="/entrar" className="text-sm text-accent hover:underline">
-              Entrar
-            </Link>
-          )}
         </div>
       </header>
 

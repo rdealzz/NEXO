@@ -82,12 +82,18 @@ function desenho(a: Avatar) {
     case "camelo":
       return (
         <>
-          <path d="M18 74c0-14 8-22 14-30 4-6 10-10 18-10 12 0 20 8 20 20 0 12-6 20-6 20z" fill={a.corpo} />
-          <ellipse cx="66" cy="70" rx="16" ry="12" fill={a.corpo} />
-          <ellipse cx="72" cy="74" rx="9" ry="7" fill={a.detalhe} opacity="0.35" />
-          <circle cx="62" cy="64" r="3.6" fill="#1d1b16" />
-          <circle cx="63.2" cy="62.8" r="1.2" fill="#fff" />
-          <path d="M40 30l4 8" stroke={a.detalhe} strokeWidth="3" strokeLinecap="round" />
+          {/* A corcova atrás, depois a cabeça: é ela que faz reconhecer o bicho. */}
+          <ellipse cx="50" cy="36" rx="27" ry="13" fill={a.corpo} opacity="0.75" />
+          <ellipse cx="33" cy="30" rx="6" ry="8" fill={a.corpo} transform="rotate(-20 33 30)" />
+          <ellipse cx="67" cy="30" rx="6" ry="8" fill={a.corpo} transform="rotate(20 67 30)" />
+          <ellipse cx="50" cy="54" rx="19" ry="23" fill={a.corpo} />
+          <ellipse cx="50" cy="70" rx="14" ry="12" fill={a.detalhe} opacity="0.35" />
+          <circle cx="42" cy="48" r="3.8" fill="#1d1b16" />
+          <circle cx="58" cy="48" r="3.8" fill="#1d1b16" />
+          <circle cx="43.2" cy="46.8" r="1.3" fill="#fff" />
+          <circle cx="59.2" cy="46.8" r="1.3" fill="#fff" />
+          <ellipse cx="45" cy="68" rx="2" ry="2.6" fill="#6b4a24" />
+          <ellipse cx="55" cy="68" rx="2" ry="2.6" fill="#6b4a24" />
         </>
       );
     case "pinguim":

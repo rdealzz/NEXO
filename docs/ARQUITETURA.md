@@ -15,7 +15,8 @@ src/app/
   onboarding/               ✅ Etapa 1 — conversão: promessa → ROI → paywall
   entrar/ · auth/           ✅ contas
   inbox/                    ✅ o produto
-  configuracoes/            ✅ canais de entrada · (Etapa 4: legal, LGPD, conta)
+  perfil/                   ✅ a aba da pessoa: identidade, assinatura, cobrança, avisos
+  configuracoes/            ✅ canais de entrada (WhatsApp, e-mail)
   legal/                    ✅ Etapa 4 — Termos de Uso e Política de Privacidade
   api/
     capture · reminders     ✅ Etapa 5 — extração e persistência
@@ -28,6 +29,7 @@ src/app/
 src/components/
   ui/button.tsx             ✅ botões 3D (o relevo mora em globals.css)
   ui/logo.tsx               ✅ símbolo, wordmark e lockup em React
+  perfil/                   ✅ avatar, chip do cabeçalho, identidade e cobrança
   ui/tema.tsx               ✅ Etapa 2 — alternador Sol/Lua e escolha do tema
   onboarding/               ✅ Etapa 1 — fluxo, cards de ROI, paywall
   permissoes/               ✅ Etapa 3 — explicação e câmera embutida
@@ -60,6 +62,28 @@ notificação chega no celular — que era o ponto: o aviso tem cara de NEXO.
 | `src/components/ui/logo.tsx` | dentro do app — acompanha o tema |
 
 Verde da marca `#146b4f`, luz `#7fecc0`, base creme `#fbf8f0`.
+
+## Perfil
+
+Um lugar só para tudo que é da pessoa: quem ela é, o que ela paga, como o NEXO
+fala com ela e como ela vai embora. Espalhar isso em várias telas é o que faz
+alguém desistir de procurar.
+
+O **chip no canto superior esquerdo** — retrato e primeiro nome — é a porta. Ele
+substituiu o wordmark dentro do app: quem já está lá dentro não precisa da marca
+de novo, precisa saber em qual conta está.
+
+Os **avatares são bichos desenhados em SVG** (`src/lib/avatares.ts`), não fotos:
+carregam em qualquer conexão, ficam nítidos em qualquer tamanho e não dependem
+de um serviço de terceiros que um dia sai do ar. Vêm em duas famílias, quentes e
+frios — escolher entre oito iguais é decisão, escolher entre dois climas é
+gosto. Sem escolha, o bicho sai do id da conta, estável e sem repetir.
+
+O avatar salva no toque; o nome espera o "Salvar", porque salvar texto a cada
+tecla é uma requisição por letra.
+
+**Cartão:** o NEXO nunca vê o número. Ele é digitado na página do gateway, que
+devolve bandeira e quatro dígitos — é isso, e só isso, que a tela mostra.
 
 ## Assinatura
 
