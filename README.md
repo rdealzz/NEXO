@@ -84,8 +84,17 @@ boletos ficam num bucket privado — nunca público.
 
 `/api/cron/dispatch` varre os avisos vencidos e entrega. Sem
 `NEXO_NOTIFY_WEBHOOK`, escreve no log; com webhook, faz um `POST` JSON por aviso
-— é aí que entram WhatsApp, Telegram, push ou e-mail. `vercel.json` agenda a
-varredura de hora em hora, e a Vercel autentica com `CRON_SECRET`.
+— é aí que entram WhatsApp, Telegram, push ou e-mail.
+
+Quem chama essa rota depende do plano:
+
+| Onde | Frequência | Observação |
+| --- | --- | --- |
+| `.github/workflows/avisos.yml` | a cada 10 min | É o despachante de verdade. Precisa dos secrets `NEXO_URL` e `CRON_SECRET` no repositório. Funciona em qualquer plano. |
+| `vercel.json` | 1×/dia | Rede de segurança. **O plano Hobby da Vercel só aceita cron diário — um cron mais frequente aqui faz o deploy falhar.** No Pro, troque por `*/10 * * * *` e apague o workflow. |
+
+A Vercel manda `Authorization: Bearer $CRON_SECRET` sozinha; o workflow manda o
+mesmo header.
 
 ### Entrada de fora do app
 
