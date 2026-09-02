@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { InboxClient } from "@/components/inbox-client";
+import { PainelNotificacoes } from "@/components/notificacoes/painel";
 import { AtivarAvisos } from "@/components/permissoes/avisos";
 import { MarcaNexo } from "@/components/ui/logo";
 import { AlternadorTema } from "@/components/ui/tema";
@@ -30,6 +31,10 @@ export default async function InboxPage({
           <p className="text-sm text-muted">Joga aqui. Eu lembro.</p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
+          <Link href="/calendario" className="text-sm text-muted hover:text-foreground">
+            Calendário
+          </Link>
+          <PainelNotificacoes reminders={reminders} />
           <AlternadorTema />
           {owner.authenticated ? (
             <Link href="/configuracoes" className="text-sm text-muted hover:text-foreground">
