@@ -1,5 +1,6 @@
 import { RodapeLegal } from "@/components/legal/rodape";
 import { BotaoLink } from "@/components/ui/button";
+import HelixChronoMatrix from "@/components/ui/helix-chrono-matrix";
 import { MarcaNexo } from "@/components/ui/logo";
 import { AlternadorTema } from "@/components/ui/tema";
 import { brl, PLANO } from "@/lib/pricing";
@@ -14,31 +15,48 @@ const EXEMPLOS = [
 
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-14 sm:py-20">
-      <header className="flex items-center justify-between gap-4">
-        <MarcaNexo simbolo="size-9" wordmark="h-4" className="text-foreground" />
-        <AlternadorTema />
-      </header>
+    <main className="flex-1">
+      {/* A malha fica atrás da marca e dos botões — e o degradê no rodapé dela
+          entrega a página sem uma emenda dura. */}
+      <section className="relative isolate min-h-[34rem] overflow-hidden">
+        {/* z-0 fecha o empilhamento da malha dentro deste wrapper: sem isso a
+            camada interna dela (z-20) passaria por cima dos botões. */}
+        <div className="absolute inset-0 z-0">
+          <HelixChronoMatrix headline="" className="[&_header]:hidden" />
+        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-background" />
 
-      <h1 className="mt-3 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-        Joga aqui.
-        <br />
-        Eu lembro.
-      </h1>
+        {/* O conteúdo não captura o mouse: assim a malha continua reagindo ao
+            movimento em todo o herói, e só os controles recebem o clique. */}
+        <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-2xl flex-col px-4 py-10 [&_a]:pointer-events-auto [&_button]:pointer-events-auto sm:py-14">
+          <header className="flex items-center justify-between gap-4">
+            <MarcaNexo simbolo="size-9" wordmark="h-4" className="text-neutral-900 dark:text-white" />
+            <AlternadorTema />
+          </header>
 
-      <p className="mt-5 max-w-xl text-lg text-muted">
-        Uma foto, um áudio, um print, um PDF, um e-mail encaminhado, ou só uma frase. O NEXO lê, entende o que
-        precisa acontecer e avisa você na hora certa. Você não cadastra tarefa nenhuma.
-      </p>
+          <h1 className="mt-10 text-4xl font-semibold leading-[1.1] tracking-tight text-neutral-900 sm:text-5xl dark:text-white">
+            Joga aqui.
+            <br />
+            Eu lembro.
+          </h1>
 
-      <div className="mt-8 flex flex-wrap gap-3">
-        <BotaoLink href="/onboarding" variant="primary" size="lg">
-          Começar
-        </BotaoLink>
-        <BotaoLink href="/entrar" variant="surface" size="lg">
-          Entrar
-        </BotaoLink>
-      </div>
+          <p className="mt-5 max-w-md text-lg text-neutral-600 dark:text-neutral-300">
+            Uma foto, um áudio, um print, um PDF, um e-mail encaminhado, ou só uma frase. O NEXO lê, entende o
+            que precisa acontecer e avisa você na hora certa. Você não cadastra tarefa nenhuma.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <BotaoLink href="/onboarding" variant="primary" size="lg">
+              Começar
+            </BotaoLink>
+            <BotaoLink href="/entrar" variant="surface" size="lg">
+              Entrar
+            </BotaoLink>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto w-full max-w-2xl px-4 pb-14">
 
       <section className="mt-16">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">Como funciona na prática</h2>
@@ -89,7 +107,8 @@ export default function Home() {
 
       <p className="mt-14 text-center text-lg font-medium">Pensou → mandou → esqueceu → NEXO lembra.</p>
 
-      <RodapeLegal />
+        <RodapeLegal />
+      </div>
     </main>
   );
 }

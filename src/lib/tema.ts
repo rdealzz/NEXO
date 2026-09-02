@@ -44,6 +44,8 @@ export function lerPreferencia(): Tema {
 export function aplicarTema(preferencia: Tema): "claro" | "escuro" {
   const resolvido = resolverTema(preferencia);
   document.documentElement.dataset.tema = resolvido;
+  // A classe `dark` é a convenção que os componentes de terceiros leem.
+  document.documentElement.classList.toggle("dark", resolvido === "escuro");
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", COR_DA_BARRA[resolvido]);
   try {
     localStorage.setItem(CHAVE_TEMA, preferencia);
@@ -57,4 +59,4 @@ export function aplicarTema(preferencia: Tema): "claro" | "escuro" {
  * Roda antes da primeira pintura, no <body>. Sem isso, quem escolheu escuro vê
  * um flash branco a cada carregamento — o pior jeito de entregar modo escuro.
  */
-export const SCRIPT_DO_TEMA = `(function(){try{var p=localStorage.getItem("${CHAVE_TEMA}")||"${TEMA_PADRAO}";var e=p==="escuro"||(p==="sistema"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.tema=e?"escuro":"claro";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",e?"${COR_DA_BARRA.escuro}":"${COR_DA_BARRA.claro}");}catch(_){document.documentElement.dataset.tema="claro";}})();`;
+export const SCRIPT_DO_TEMA = `(function(){try{var p=localStorage.getItem("${CHAVE_TEMA}")||"${TEMA_PADRAO}";var e=p==="escuro"||(p==="sistema"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.tema=e?"escuro":"claro";document.documentElement.classList.toggle("dark",e);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",e?"${COR_DA_BARRA.escuro}":"${COR_DA_BARRA.claro}");}catch(_){document.documentElement.dataset.tema="claro";}})();`;
