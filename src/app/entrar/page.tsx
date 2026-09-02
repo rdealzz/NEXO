@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { Botao, BotaoAncora } from "@/components/ui/button";
 import { MarcaNexo } from "@/components/ui/logo";
+import { AlternadorTema } from "@/components/ui/tema";
 
 import { authConfigured, currentUser, supabaseServer } from "@/lib/supabase/server";
 
@@ -65,9 +66,12 @@ export default async function EntrarPage({
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-16">
-      <Link href="/" aria-label="NEXO" className="inline-flex">
-        <MarcaNexo simbolo="size-8" wordmark="h-4" />
-      </Link>
+      <header className="flex items-center justify-between gap-4">
+        <Link href="/" aria-label="NEXO" className="inline-flex">
+          <MarcaNexo simbolo="size-8" wordmark="h-4" />
+        </Link>
+        <AlternadorTema />
+      </header>
       <h1 className="mt-4 text-3xl font-semibold tracking-tight">Entrar</h1>
       <p className="mt-2 text-muted">
         Sem senha. Você recebe um link por e-mail e pronto. O que você já jogou aqui neste aparelho vai junto para a

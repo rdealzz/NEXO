@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
+import { SCRIPT_DO_TEMA } from "@/lib/tema";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,17 +19,17 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f7f5" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d0e0c" },
-  ],
-};
+// Uma cor só: o app abre claro. O script do tema troca esta meta quando a
+// pessoa escolhe escuro.
+export const viewport: Viewport = { themeColor: "#f7f7f5" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html lang="pt-BR" className="h-full antialiased" data-tema="claro" suppressHydrationWarning>
+      <body className="flex min-h-full flex-col">
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_DO_TEMA }} />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 import { BotaoLink } from "@/components/ui/button";
 import { MarcaNexo } from "@/components/ui/logo";
+import { AlternadorTema } from "@/components/ui/tema";
 import { brl, PLANO } from "@/lib/pricing";
 
 const EXEMPLOS = [
@@ -13,7 +14,10 @@ const EXEMPLOS = [
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-14 sm:py-20">
-      <MarcaNexo simbolo="size-9" wordmark="h-4" className="text-foreground" />
+      <header className="flex items-center justify-between gap-4">
+        <MarcaNexo simbolo="size-9" wordmark="h-4" className="text-foreground" />
+        <AlternadorTema />
+      </header>
 
       <h1 className="mt-3 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
         Joga aqui.

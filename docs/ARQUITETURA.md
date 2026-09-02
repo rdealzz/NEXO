@@ -27,7 +27,7 @@ src/app/
 src/components/
   ui/button.tsx             ✅ botões 3D (o relevo mora em globals.css)
   ui/logo.tsx               ✅ símbolo, wordmark e lockup em React
-  ui/tema.tsx               ⬜ Etapa 2 — alternador Sol/Lua
+  ui/tema.tsx               ✅ Etapa 2 — alternador Sol/Lua e escolha do tema
   onboarding/               ✅ Etapa 1 — fluxo, cards de ROI, paywall
   permissoes/               ⬜ Etapa 3 — modais de câmera e galeria
   legal/                    ⬜ Etapa 4 — banner de cookies, exclusão de conta
@@ -38,6 +38,7 @@ src/lib/
   nexo/                     ✅ Etapa 5 — prompt, extração, regras preditivas
   db/                       ✅ store em memória (dev) e Supabase (produção)
   notify.ts                 ✅ entrega do aviso, já com a cara da marca
+  tema.ts                   ✅ Etapa 2 — preferência de tema e script anti-flash
   assinatura/               ⬜ Etapa 6 — cliente do gateway e estado do plano
 ```
 
@@ -55,6 +56,21 @@ notificação chega no celular — que era o ponto: o aviso tem cara de NEXO.
 | `src/components/ui/logo.tsx` | dentro do app — acompanha o tema |
 
 Verde da marca `#146b4f`, luz `#7fecc0`, base creme `#fbf8f0`.
+
+## Tema
+
+O app **abre no claro, sempre** — inclusive para quem usa o sistema no escuro.
+O escuro só entra quando a pessoa pede, e a escolha vale nos acessos seguintes.
+
+Como isso se sustenta: o CSS só tem o escuro sob `:root[data-tema="escuro"]`
+(não há `prefers-color-scheme` decidindo nada), e `SCRIPT_DO_TEMA` roda no topo
+do `<body>`, antes da primeira pintura — sem ele, quem escolheu escuro veria um
+flash branco a cada carregamento.
+
+O alternador Sol/Lua fica no cabeçalho de todas as telas; em Configurações há a
+escolha completa (Claro · Escuro · Sistema). Os dois leem o mesmo estado por
+`useSyncExternalStore`, então nunca discordam — e mudar o tema numa aba
+atualiza a outra.
 
 ## Botões
 

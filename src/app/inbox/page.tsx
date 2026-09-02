@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { InboxClient } from "@/components/inbox-client";
 import { MarcaNexo } from "@/components/ui/logo";
+import { AlternadorTema } from "@/components/ui/tema";
 import { store } from "@/lib/db";
 import { currentOwner } from "@/lib/owner";
 import { ensureProfile } from "@/lib/profile";
@@ -27,15 +28,18 @@ export default async function InboxPage({
           </Link>
           <p className="text-sm text-muted">Joga aqui. Eu lembro.</p>
         </div>
-        {owner.authenticated ? (
-          <Link href="/configuracoes" className="shrink-0 text-sm text-muted hover:text-foreground">
-            Configurações
-          </Link>
-        ) : (
-          <Link href="/entrar" className="shrink-0 text-sm text-accent hover:underline">
-            Entrar
-          </Link>
-        )}
+        <div className="flex shrink-0 items-center gap-3">
+          <AlternadorTema />
+          {owner.authenticated ? (
+            <Link href="/configuracoes" className="text-sm text-muted hover:text-foreground">
+              Configurações
+            </Link>
+          ) : (
+            <Link href="/entrar" className="text-sm text-accent hover:underline">
+              Entrar
+            </Link>
+          )}
+        </div>
       </header>
 
       {migrados && (

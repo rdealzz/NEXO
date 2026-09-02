@@ -16,25 +16,33 @@
   --btn-shade: rgb(0 0 0 / 0.1);
   --btn-cast: rgb(22 21 15 / 0.2);
   --btn-primary-ink: #ffffff;
+
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0d0e0c;
-    --surface: #161815;
-    --border: #262a25;
-    --foreground: #ececea;
-    --muted: #9b9a92;
-    --accent: #4ade9f;
-    --accent-soft: #14261f;
-    --danger: #ff6b5c;
-    --warning: #f0b83c;
+/*
+ * O escuro é uma escolha, nunca um palpite: só entra quando o atributo está no
+ * <html>, e quem põe ele lá é o script de src/lib/tema.ts, lendo o que a pessoa
+ * escolheu. Sem escolha salva, o app abre claro — inclusive para quem usa o
+ * sistema no escuro.
+ */
+:root[data-tema="escuro"] {
+  --background: #0d0e0c;
+  --surface: #161815;
+  --border: #262a25;
+  --foreground: #ececea;
+  --muted: #9b9a92;
+  --accent: #4ade9f;
+  --accent-soft: #14261f;
+  --danger: #ff6b5c;
+  --warning: #f0b83c;
 
-    --btn-gloss: rgb(255 255 255 / 0.1);
-    --btn-shade: rgb(0 0 0 / 0.35);
-    --btn-cast: rgb(0 0 0 / 0.55);
-    --btn-primary-ink: #06231a;
-  }
+  --btn-gloss: rgb(255 255 255 / 0.1);
+  --btn-shade: rgb(0 0 0 / 0.35);
+  --btn-cast: rgb(0 0 0 / 0.55);
+  --btn-primary-ink: #06231a;
+
+  color-scheme: dark;
 }
 
 @theme inline {

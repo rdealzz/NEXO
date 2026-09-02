@@ -7,6 +7,7 @@ import { Paywall } from "@/components/onboarding/paywall";
 import { RoiCalculadora } from "@/components/onboarding/roi-calculadora";
 import { Botao } from "@/components/ui/button";
 import { MarcaNexo } from "@/components/ui/logo";
+import { AlternadorTema } from "@/components/ui/tema";
 import { totalPerdido, vezesPadrao } from "@/lib/onboarding/roi";
 
 const EXEMPLOS = [
@@ -49,11 +50,14 @@ export function OnboardingFlow() {
           <Link href="/" aria-label="NEXO" className="inline-flex">
             <MarcaNexo />
           </Link>
-          {!ultima && (
-            <Botao size="chip" variant="ghost" onClick={() => setEtapa(ETAPAS.length - 1)}>
-              Pular para o plano
-            </Botao>
-          )}
+          <span className="flex items-center gap-3">
+            {!ultima && (
+              <Botao size="chip" variant="ghost" onClick={() => setEtapa(ETAPAS.length - 1)}>
+                Pular para o plano
+              </Botao>
+            )}
+            <AlternadorTema />
+          </span>
         </div>
 
         <ol className="mt-4 flex gap-1.5" aria-label="Progresso">

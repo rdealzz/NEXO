@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { Botao } from "@/components/ui/button";
 import { MarcaNexo } from "@/components/ui/logo";
+import { EscolhaTema } from "@/components/ui/tema";
 import { sendText, whatsappConfigured } from "@/lib/inbound/whatsapp";
 import { confirmPhoneLink, ensureProfile, inboundAddress, startPhoneLink } from "@/lib/profile";
 import { currentUser, supabaseServer } from "@/lib/supabase/server";
@@ -74,6 +75,14 @@ export default async function ConfiguracoesPage({
       {vinculado && <p className="mt-4 text-sm text-accent">Telefone vinculado. Pode me mandar coisas por lá.</p>}
 
       <section className="mt-8 rounded-2xl border border-line bg-surface p-4">
+        <h2 className="text-sm font-semibold">Aparência</h2>
+        <p className="mt-1 text-sm text-muted">
+          O NEXO abre no claro. O escuro fica valendo em todo acesso, neste aparelho.
+        </p>
+        <EscolhaTema />
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
         <h2 className="text-sm font-semibold">Seu endereço de entrada</h2>
         <p className="mt-1 text-sm text-muted">
           Encaminhe qualquer e-mail para cá e eu leio. Só aceito mensagens vindas do seu próprio e-mail.
