@@ -1,3 +1,4 @@
+import { RodapeLegal } from "@/components/legal/rodape";
 import { BotaoLink } from "@/components/ui/button";
 import { MarcaNexo } from "@/components/ui/logo";
 import { AlternadorTema } from "@/components/ui/tema";
@@ -87,6 +88,8 @@ export default function Home() {
       </section>
 
       <p className="mt-14 text-center text-lg font-medium">Pensou → mandou → esqueceu → NEXO lembra.</p>
+
+      <RodapeLegal />
     </main>
   );
 }

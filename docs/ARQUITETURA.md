@@ -16,12 +16,12 @@ src/app/
   entrar/ · auth/           ✅ contas
   inbox/                    ✅ o produto
   configuracoes/            ✅ canais de entrada · (Etapa 4: legal, LGPD, conta)
-  legal/                    ⬜ Etapa 4 — Termos de Uso e Política de Privacidade
+  legal/                    ✅ Etapa 4 — Termos de Uso e Política de Privacidade
   api/
     capture · reminders     ✅ Etapa 5 — extração e persistência
     cron/dispatch           ✅ Etapa 5 — despachante de avisos (custo zero de IA)
     inbound/{email,whatsapp}✅ entrada de fora do app
-    conta/excluir           ⬜ Etapa 4 — exclusão permanente da conta
+    conta/excluir           ✅ Etapa 4 — exclusão permanente da conta
     assinatura/             ⬜ Etapa 6 — checkout e webhook do gateway
 
 src/components/
@@ -30,7 +30,7 @@ src/components/
   ui/tema.tsx               ✅ Etapa 2 — alternador Sol/Lua e escolha do tema
   onboarding/               ✅ Etapa 1 — fluxo, cards de ROI, paywall
   permissoes/               ✅ Etapa 3 — explicação e câmera embutida
-  legal/                    ⬜ Etapa 4 — banner de cookies, exclusão de conta
+  legal/                    ✅ Etapa 4 — banner de cookies, rodapé, exclusão de conta
 
 src/lib/
   pricing.ts                ✅ o plano num lugar só (o checkout lê daqui)
@@ -38,6 +38,7 @@ src/lib/
   nexo/                     ✅ Etapa 5 — prompt, extração, regras preditivas
   db/                       ✅ store em memória (dev) e Supabase (produção)
   permissoes.ts             ✅ Etapa 3 — justificativas e estado das permissões
+  legal.ts · cookies.ts     ✅ Etapa 4 — controlador e consentimento
   notify.ts                 ✅ entrega do aviso, já com a cara da marca
   tema.ts                   ✅ Etapa 2 — preferência de tema e script anti-flash
   assinatura/               ⬜ Etapa 6 — cliente do gateway e estado do plano
@@ -57,6 +58,25 @@ notificação chega no celular — que era o ponto: o aviso tem cara de NEXO.
 | `src/components/ui/logo.tsx` | dentro do app — acompanha o tema |
 
 Verde da marca `#146b4f`, luz `#7fecc0`, base creme `#fbf8f0`.
+
+## LGPD e lojas
+
+**Exclusão de conta.** `deleteOwner` faz parte do contrato do `Store`, então as
+duas implementações precisam apagar tudo — e `src/lib/db/exclusao.test.ts`
+falha se alguém acrescentar uma tabela e esquecer dela. Os arquivos saem
+primeiro: se a linha da captura sumisse antes, o caminho do boleto no Storage
+viraria lixo que ninguém mais sabe apagar. Depois vão os dados, o usuário do
+Auth e o cookie do dispositivo.
+
+**Consentimento de cookies.** Hoje só existem cookies necessários (sessão e id
+do aparelho). O banner mesmo assim oferece a recusa, e a escolha fica em
+`podeMedir()` — a porta que qualquer medição futura terá de atravessar. Sem
+essa porta, o banner seria enfeite.
+
+**Identificação do controlador** vem de variáveis de ambiente
+(`NEXT_PUBLIC_EMPRESA_*`). Sem elas as páginas omitem a linha em vez de inventar
+razão social ou CNPJ — e é isso que precisa ser preenchido antes de submeter às
+lojas.
 
 ## Permissões
 

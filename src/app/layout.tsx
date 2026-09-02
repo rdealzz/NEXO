@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
+import { BannerCookies } from "@/components/legal/banner-cookies";
 import { SCRIPT_DO_TEMA } from "@/lib/tema";
 
 import "./globals.css";
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_DO_TEMA }} />
         {children}
+        <BannerCookies />
       </body>
     </html>
   );

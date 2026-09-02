@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { ExcluirConta } from "@/components/legal/excluir-conta";
 import { Botao } from "@/components/ui/button";
 import { MarcaNexo } from "@/components/ui/logo";
 import { EscolhaTema } from "@/components/ui/tema";
@@ -135,6 +136,39 @@ export default async function ConfiguracoesPage({
         <p className="mt-2 text-xs text-muted">
           Mando um código para o número antes de ativar — assim ninguém aponta o seu WhatsApp para outra conta.
         </p>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
+        <h2 className="text-sm font-semibold">Sobre e legal</h2>
+        <p className="mt-1 text-sm text-muted">
+          O que você aceita ao usar o NEXO, e o que fazemos com o que você manda.
+        </p>
+        <div className="mt-3 divide-y divide-line">
+          <Link href="/legal/termos" className="flex items-center justify-between py-2.5 text-sm hover:text-accent">
+            Termos de Uso <span aria-hidden className="text-muted">›</span>
+          </Link>
+          <Link
+            href="/legal/privacidade"
+            className="flex items-center justify-between py-2.5 text-sm hover:text-accent"
+          >
+            Política de Privacidade <span aria-hidden className="text-muted">›</span>
+          </Link>
+        </div>
+        <p className="mt-3 rounded-xl bg-accent-soft px-3 py-2 text-xs leading-snug text-accent">
+          Seus dados pessoais não treinam nenhuma inteligência artificial. O conteúdo que você manda é lido para
+          criar o lembrete e nada além disso.
+        </p>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-danger/30 bg-surface p-4">
+        <h2 className="text-sm font-semibold">Excluir minha conta</h2>
+        <p className="mt-1 text-sm text-muted">
+          Apaga permanentemente lembretes, capturas, arquivos, compras e o login. É definitivo — não guardamos
+          cópia.
+        </p>
+        <div className="mt-3">
+          <ExcluirConta email={user.email} />
+        </div>
       </section>
 
       <form action={sair} className="mt-8">
