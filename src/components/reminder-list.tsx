@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Botao } from "@/components/ui/button";
 import type { Reminder } from "@/lib/db";
 import { CATEGORY_LABEL, daysUntil, humanDate, humanLead, humanRepeat, urgencyColor } from "@/lib/format";
 
@@ -97,7 +98,7 @@ function Item({
           type="button"
           onClick={() => onComplete(reminder.id)}
           aria-label={`Concluir ${reminder.title}`}
-          className="mt-0.5 size-5 shrink-0 rounded-full border-2 transition-colors hover:border-accent"
+          className="dot3d mt-0.5 size-5 shrink-0 cursor-pointer border-2 transition-colors hover:border-accent"
           style={{ borderColor: urgencyColor(reminder.due_date) }}
         />
         <div className="min-w-0 flex-1">
@@ -122,7 +123,7 @@ function Item({
                   {opcao.label}
                 </Chip>
               ))}
-              <label className="rounded-full border border-line px-2.5 py-1 text-xs text-muted">
+              <label className="btn3d btn3d--surface btn3d--chip cursor-pointer">
                 escolher
                 <input
                   type="date"
@@ -133,13 +134,9 @@ function Item({
             </div>
           ) : (
             <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
-              <button
-                type="button"
-                onClick={() => setAberto((v) => !v)}
-                className="text-muted hover:text-foreground"
-              >
+              <Botao size="chip" variant="ghost" onClick={() => setAberto((v) => !v)} aria-pressed={aberto}>
                 {aberto ? "fechar" : "adiar"}
-              </button>
+              </Botao>
               {aberto && (
                 <>
                   {ADIAR.map((opcao) => (
@@ -147,13 +144,9 @@ function Item({
                       {opcao.label}
                     </Chip>
                   ))}
-                  <button
-                    type="button"
-                    onClick={() => onDelete(reminder.id)}
-                    className="px-1 text-muted hover:text-[#e0483a]"
-                  >
+                  <Botao size="chip" variant="danger" onClick={() => onDelete(reminder.id)}>
                     excluir
-                  </button>
+                  </Botao>
                 </>
               )}
             </div>
@@ -166,12 +159,8 @@ function Item({
 
 function Chip({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="rounded-full border border-line px-2.5 py-1 text-xs text-muted transition-colors hover:border-accent hover:text-accent"
-    >
+    <Botao size="chip" variant="surface" onClick={onClick}>
       {children}
-    </button>
+    </Botao>
   );
 }

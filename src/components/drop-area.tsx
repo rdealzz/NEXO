@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Botao } from "@/components/ui/button";
 import type { CaptureKind } from "@/lib/nexo/schema";
 
 export type CapturePayload = { kind: CaptureKind; text?: string; file?: File };
@@ -124,14 +125,15 @@ export function DropArea({ busy, onCapture }: Props) {
       {pending && (
         <div className="mb-3 flex items-center gap-2 rounded-lg bg-accent-soft px-3 py-2 text-sm">
           <span className="truncate">{pending.name}</span>
-          <button
-            type="button"
+          <Botao
+            size="chip"
+            variant="surface"
             onClick={() => setPending(null)}
-            className="ml-auto shrink-0 text-muted hover:text-foreground"
+            className="ml-auto shrink-0"
             aria-label="Remover arquivo"
           >
             remover
-          </button>
+          </Botao>
         </div>
       )}
 
@@ -148,14 +150,14 @@ export function DropArea({ busy, onCapture }: Props) {
           {listening ? "Ouvindo…" : "Falar"}
         </ToolButton>
 
-        <button
-          type="button"
+        <Botao
+          variant="primary"
           onClick={send}
           disabled={busy || (!text.trim() && !pending)}
-          className="ml-auto rounded-full bg-accent px-5 py-2 text-sm font-semibold text-background transition-opacity disabled:opacity-40"
+          className="ml-auto"
         >
           {busy ? "Entendendo…" : "Mandar"}
-        </button>
+        </Botao>
       </div>
 
       <input
@@ -189,16 +191,15 @@ function ToolButton({
   active?: boolean;
 }) {
   return (
-    <button
-      type="button"
+    <Botao
+      variant={active ? "soft" : "surface"}
+      size="sm"
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:opacity-40 ${
-        active ? "border-accent bg-accent-soft text-accent" : "border-line text-muted hover:text-foreground"
-      }`}
+      aria-pressed={active}
     >
       {children}
-    </button>
+    </Botao>
   );
 }
 

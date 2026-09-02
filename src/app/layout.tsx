@@ -8,7 +8,13 @@ export const metadata: Metadata = {
     "Jogue aqui qualquer coisa que não pode esquecer: uma foto, um áudio, um print, um PDF, um e-mail. O NEXO entende o que precisa acontecer e avisa você na hora certa.",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "NEXO", statusBarStyle: "default" },
-  icons: { icon: "/icone.svg", apple: "/icone.svg" },
+  icons: {
+    icon: [
+      { url: "/icone.svg", type: "image/svg+xml" },
+      { url: "/icone-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {

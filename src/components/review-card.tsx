@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Botao } from "@/components/ui/button";
 import { CATEGORY_LABEL, humanDate, humanLead, humanRepeat } from "@/lib/format";
 import type { FollowUp } from "@/lib/nexo/rules";
 import type { CaptureAnalysis } from "@/lib/nexo/schema";
@@ -97,9 +98,9 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
               : ""}
           </p>
         </div>
-        <button type="button" onClick={onDiscard} className="ml-auto shrink-0 text-sm text-muted hover:text-foreground">
+        <Botao size="chip" variant="ghost" onClick={onDiscard} className="ml-auto shrink-0">
           descartar
-        </button>
+        </Botao>
       </header>
 
       {compra && (
@@ -137,13 +138,9 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
               placeholder="ex.: dia 20, de manhã"
               className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none"
             />
-            <button
-              type="submit"
-              disabled={!answer.trim() || saving}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-background disabled:opacity-40"
-            >
+            <Botao type="submit" variant="primary" size="sm" disabled={!answer.trim() || saving}>
               Responder
-            </button>
+            </Botao>
           </form>
         </div>
       )}
@@ -206,14 +203,15 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
       )}
 
       {rows.length > 0 && (
-        <button
-          type="button"
+        <Botao
+          variant="primary"
+          block
+          className="mt-4"
           onClick={() => onConfirm(chosen.map(({ key: _k, selected: _s, pitch: _p, uncertain: _u, ...draft }) => draft))}
           disabled={chosen.length === 0 || saving}
-          className="mt-4 w-full rounded-full bg-accent py-2.5 text-sm font-semibold text-background disabled:opacity-40"
         >
           {saving ? "Salvando…" : chosen.length === 1 ? "Confirmar" : `Confirmar ${chosen.length} itens`}
-        </button>
+        </Botao>
       )}
     </section>
   );

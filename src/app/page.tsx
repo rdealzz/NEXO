@@ -1,4 +1,6 @@
-import Link from "next/link";
+import { BotaoLink } from "@/components/ui/button";
+import { MarcaNexo } from "@/components/ui/logo";
+import { brl, PLANO } from "@/lib/pricing";
 
 const EXEMPLOS = [
   { entrada: "Foto da nota fiscal da TV", saida: "Garantia até 02/09/2027. Aviso 30 dias antes?" },
@@ -11,7 +13,7 @@ const EXEMPLOS = [
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-14 sm:py-20">
-      <p className="text-sm font-semibold tracking-tight text-accent">NEXO</p>
+      <MarcaNexo simbolo="size-9" wordmark="h-4" className="text-foreground" />
 
       <h1 className="mt-3 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
         Joga aqui.
@@ -25,15 +27,12 @@ export default function Home() {
       </p>
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link href="/inbox" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-background">
+        <BotaoLink href="/onboarding" variant="primary" size="lg">
           Começar
-        </Link>
-        <Link
-          href="/entrar"
-          className="rounded-full border border-line px-6 py-3 text-sm font-semibold text-muted hover:text-foreground"
-        >
+        </BotaoLink>
+        <BotaoLink href="/entrar" variant="surface" size="lg">
           Entrar
-        </Link>
+        </BotaoLink>
       </div>
 
       <section className="mt-16">
@@ -70,6 +69,17 @@ export default function Home() {
         <p className="mt-3 text-sm text-muted">
           Você não precisa pensar “o que eu preciso lembrar?”. Essa parte é com ele.
         </p>
+      </section>
+
+      <section className="mt-12 rounded-2xl border border-line bg-surface p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">Ele se paga sozinho</h2>
+        <p className="mt-3 leading-relaxed">
+          Um boleto pago com atraso, uma consulta esquecida, uma garantia que venceu sem você usar. Esquecer não é
+          de graça — só não vem com recibo. O NEXO custa {brl(PLANO.precoMensal)} por mês.
+        </p>
+        <BotaoLink href="/onboarding" variant="soft" className="mt-4">
+          Fazer a conta do meu caso
+        </BotaoLink>
       </section>
 
       <p className="mt-14 text-center text-lg font-medium">Pensou → mandou → esqueceu → NEXO lembra.</p>

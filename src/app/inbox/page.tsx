@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { InboxClient } from "@/components/inbox-client";
+import { MarcaNexo } from "@/components/ui/logo";
 import { store } from "@/lib/db";
 import { currentOwner } from "@/lib/owner";
 import { ensureProfile } from "@/lib/profile";
@@ -21,8 +22,8 @@ export default async function InboxPage({
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:py-10">
       <header className="mb-6 flex items-baseline justify-between gap-3">
         <div>
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            NEXO
+          <Link href="/" aria-label="NEXO">
+            <MarcaNexo />
           </Link>
           <p className="text-sm text-muted">Joga aqui. Eu lembro.</p>
         </div>

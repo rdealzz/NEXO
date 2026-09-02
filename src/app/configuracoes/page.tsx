@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { Botao } from "@/components/ui/button";
+import { MarcaNexo } from "@/components/ui/logo";
 import { sendText, whatsappConfigured } from "@/lib/inbound/whatsapp";
 import { confirmPhoneLink, ensureProfile, inboundAddress, startPhoneLink } from "@/lib/profile";
 import { currentUser, supabaseServer } from "@/lib/supabase/server";
@@ -57,8 +59,8 @@ export default async function ConfiguracoesPage({
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:py-10">
       <header className="mb-8 flex items-baseline justify-between">
-        <Link href="/inbox" className="text-lg font-semibold tracking-tight">
-          NEXO
+        <Link href="/inbox" aria-label="NEXO">
+          <MarcaNexo />
         </Link>
         <Link href="/inbox" className="text-sm text-muted hover:text-foreground">
           voltar
@@ -104,9 +106,9 @@ export default async function ConfiguracoesPage({
               placeholder="código de 6 dígitos"
               className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none"
             />
-            <button type="submit" className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-background">
+            <Botao type="submit" variant="primary" size="sm">
               Confirmar
-            </button>
+            </Botao>
           </form>
         ) : (
           <form action={vincularTelefone} className="mt-3 flex gap-2">
@@ -116,9 +118,9 @@ export default async function ConfiguracoesPage({
               placeholder="55 11 90000-0000"
               className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none"
             />
-            <button type="submit" className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-background">
+            <Botao type="submit" variant="primary" size="sm">
               Vincular
-            </button>
+            </Botao>
           </form>
         )}
         <p className="mt-2 text-xs text-muted">
@@ -127,9 +129,9 @@ export default async function ConfiguracoesPage({
       </section>
 
       <form action={sair} className="mt-8">
-        <button type="submit" className="text-sm text-muted underline underline-offset-4 hover:text-foreground">
+        <Botao type="submit" variant="ghost" size="sm">
           Sair da conta
-        </button>
+        </Botao>
       </form>
     </main>
   );

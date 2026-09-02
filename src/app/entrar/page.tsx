@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { Botao, BotaoAncora } from "@/components/ui/button";
+import { MarcaNexo } from "@/components/ui/logo";
+
 import { authConfigured, currentUser, supabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -62,8 +65,8 @@ export default async function EntrarPage({
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-16">
-      <Link href="/" className="text-sm font-semibold tracking-tight text-accent">
-        NEXO
+      <Link href="/" aria-label="NEXO" className="inline-flex">
+        <MarcaNexo simbolo="size-8" wordmark="h-4" />
       </Link>
       <h1 className="mt-4 text-3xl font-semibold tracking-tight">Entrar</h1>
       <p className="mt-2 text-muted">
@@ -85,12 +88,9 @@ export default async function EntrarPage({
             placeholder="voce@email.com"
             className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent"
           />
-          <button
-            type="submit"
-            className="w-full rounded-full bg-accent py-3 text-sm font-semibold text-background"
-          >
+          <Botao type="submit" variant="primary" size="lg" block>
             Me manda o link
-          </button>
+          </Botao>
         </form>
       )}
 
@@ -102,12 +102,9 @@ export default async function EntrarPage({
             <span className="h-px flex-1 bg-[var(--border)]" />
           </div>
 
-          <a
-            href="/auth/google"
-            className="mt-4 block rounded-full border border-line py-3 text-center text-sm font-semibold"
-          >
+          <BotaoAncora href="/auth/google" variant="surface" size="lg" block className="mt-4">
             Continuar com Google
-          </a>
+          </BotaoAncora>
 
           <details className="mt-4">
             <summary className="cursor-pointer text-sm text-muted">Prefiro e-mail e senha</summary>
@@ -129,9 +126,9 @@ export default async function EntrarPage({
                 placeholder="senha (mínimo 8 caracteres)"
                 className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent"
               />
-              <button type="submit" className="w-full rounded-full border border-line py-3 text-sm font-semibold">
+              <Botao type="submit" variant="surface" size="lg" block>
                 Entrar ou criar conta
-              </button>
+              </Botao>
             </form>
           </details>
         </>

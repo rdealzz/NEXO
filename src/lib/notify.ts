@@ -20,6 +20,19 @@ export function messageFor(reminder: Reminder, lead: number): string {
   return `Em ${dias} dias: ${reminder.title}`;
 }
 
+/**
+ * A cara do aviso no celular: o sino do NEXO. Push da web, Android e a maioria
+ * dos gateways aceitam esses três campos; quem não aceitar, ignora.
+ */
+export function notificationAssets() {
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  return {
+    icon: `${site}/icone-notificacao.png`,
+    badge: `${site}/badge-notificacao.png`,
+    color: "#146b4f",
+  };
+}
+
 export async function deliver(reminder: Reminder, lead: number): Promise<Delivery> {
   const url = process.env.NEXO_NOTIFY_WEBHOOK;
   const text = messageFor(reminder, lead);
@@ -42,6 +55,7 @@ export async function deliver(reminder: Reminder, lead: number): Promise<Deliver
         due_time: reminder.due_time,
         category: reminder.category,
         lead_minutes: lead,
+        ...notificationAssets(),
       }),
     });
     return {

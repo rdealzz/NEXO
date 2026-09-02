@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { DropArea, type CapturePayload } from "@/components/drop-area";
 import { ReminderList, type Aba } from "@/components/reminder-list";
 import { ReviewCard, type ConfirmedDraft } from "@/components/review-card";
+import { Botao } from "@/components/ui/button";
 import type { Reminder } from "@/lib/db";
 import { daysUntil } from "@/lib/format";
 import type { FollowUp } from "@/lib/nexo/rules";
@@ -139,21 +140,20 @@ export function InboxClient({ initialReminders }: { initialReminders: Reminder[]
         />
       )}
 
-      <nav className="flex gap-1 border-b border-line">
+      <nav className="flex flex-wrap gap-2">
         {ABAS.map((item) => (
-          <button
+          <Botao
             key={item.id}
-            type="button"
+            size="sm"
+            variant={aba === item.id ? "primary" : "surface"}
+            aria-pressed={aba === item.id}
             onClick={() => setAba(item.id)}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm transition-colors ${
-              aba === item.id
-                ? "border-accent font-medium text-foreground"
-                : "border-transparent text-muted hover:text-foreground"
-            }`}
           >
             {item.label}
-            {contagem[item.id] > 0 && <span className="ml-1.5 text-xs text-muted">{contagem[item.id]}</span>}
-          </button>
+            {contagem[item.id] > 0 && (
+              <span className="text-xs font-normal opacity-70">{contagem[item.id]}</span>
+            )}
+          </Botao>
         ))}
       </nav>
 

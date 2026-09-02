@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 200" role="img" aria-label="NEXO">
+  <title>NEXO</title>
+  <g fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 140V60l68 80V60"/>
+    <path d="M121 60v80M121 60h65M121 100h55M121 140h65"/>
+    <path d="M228 60l68 80M296 60l-68 80"/>
+    <circle cx="383" cy="100" r="44"/>
+  </g>
+</svg>

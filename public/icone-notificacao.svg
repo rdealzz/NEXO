@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NEXO">
+  <title>NEXO</title>
+  <defs>
+    <linearGradient id="nt-face" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#7fecc0"/>
+      <stop offset="0.5" stop-color="#2e9d74"/>
+      <stop offset="1" stop-color="#14684b"/>
+    </linearGradient>
+    <linearGradient id="nt-luz" x1="0.15" y1="0" x2="0.5" y2="0.85">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <path id="nt-sino" d="M256 148c-56 0-95 42-95 112 0 45-8 85-27 109-7 9-1 23 11 23h222c12 0 18-14 11-23-19-24-27-64-27-109 0-70-39-112-95-112z"/>
+    <path id="nt-badalo" d="M224 392h64c0 20-14 35-32 35s-32-15-32-35z"/>
+    <clipPath id="nt-recorte"><use href="#nt-sino"/></clipPath>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="#fbf8f0"/>
+
+  <g fill="#11543d" opacity="0.5" transform="translate(0 10)">
+    <use href="#nt-sino"/>
+    <use href="#nt-badalo"/>
+  </g>
+  <g fill="url(#nt-face)">
+    <circle cx="256" cy="131" r="21"/>
+    <use href="#nt-sino"/>
+    <use href="#nt-badalo"/>
+  </g>
+  <g clip-path="url(#nt-recorte)">
+    <rect width="512" height="512" fill="url(#nt-luz)"/>
+  </g>
+  <path d="M217 340v-96l78 82v-82" fill="none" stroke="#fbfefc" stroke-width="28"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g fill="none" stroke="#2e9d74" stroke-width="22" stroke-linecap="round" opacity="0.9">
+    <path d="M118 372a232 232 0 0 1 14-208"/>
+    <path d="M394 372a232 232 0 0 0-14-208"/>
+  </g>
+</svg>

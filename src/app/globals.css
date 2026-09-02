@@ -8,6 +8,14 @@
   --muted: #6d6a60;
   --accent: #146b4f;
   --accent-soft: #e3f2ea;
+  --danger: #e0483a;
+  --warning: #e5a11c;
+
+  /* Relevo dos botões 3D: brilho de cima, sombra de baixo, sombra projetada. */
+  --btn-gloss: rgb(255 255 255 / 0.55);
+  --btn-shade: rgb(0 0 0 / 0.1);
+  --btn-cast: rgb(22 21 15 / 0.2);
+  --btn-primary-ink: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +27,13 @@
     --muted: #9b9a92;
     --accent: #4ade9f;
     --accent-soft: #14261f;
+    --danger: #ff6b5c;
+    --warning: #f0b83c;
+
+    --btn-gloss: rgb(255 255 255 / 0.1);
+    --btn-shade: rgb(0 0 0 / 0.35);
+    --btn-cast: rgb(0 0 0 / 0.55);
+    --btn-primary-ink: #06231a;
   }
 }
 
@@ -30,6 +45,8 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -38,4 +55,204 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------------
+   Botões 3D
+   ---------------------------------------------------------------------------
+   Um botão é uma peça física: face iluminada por cima, espessura sólida embaixo
+   (--btn-depth) e sombra projetada no fundo. Passar o mouse levanta a peça;
+   clicar afunda ela até a base e a sombra some junto — é o afundar que faz o
+   clique parecer real.
+
+   Uso: className="btn3d btn3d--primary" (ver src/components/ui/button.tsx).
+--------------------------------------------------------------------------- */
+.btn3d {
+  --btn-face: var(--surface);
+  --btn-ink: var(--foreground);
+  --btn-depth: 4px;
+  --btn-edge: color-mix(in oklab, var(--btn-face) 72%, #000);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 0;
+  border-radius: 9999px;
+  padding: 0.7rem 1.3rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--btn-ink);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--btn-face) 90%, #fff) 0%,
+    var(--btn-face) 55%,
+    color-mix(in oklab, var(--btn-face) 94%, #000) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 var(--btn-gloss),
+    inset 0 -1px 0 var(--btn-shade),
+    0 var(--btn-depth) 0 var(--btn-edge),
+    0 calc(var(--btn-depth) + 3px) 10px -3px var(--btn-cast);
+  transform: translateY(0);
+  transition:
+    transform 120ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 120ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    filter 120ms ease;
+}
+
+.btn3d:hover:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 var(--btn-gloss),
+    inset 0 -1px 0 var(--btn-shade),
+    0 calc(var(--btn-depth) + 1px) 0 var(--btn-edge),
+    0 calc(var(--btn-depth) + 6px) 14px -3px var(--btn-cast);
+}
+
+/* Afunda até a base: a espessura vira 1px e a sombra projetada quase some. */
+.btn3d:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(calc(var(--btn-depth) - 1px));
+  filter: brightness(0.98);
+  box-shadow:
+    inset 0 1px 2px var(--btn-shade),
+    0 1px 0 var(--btn-edge),
+    0 1px 2px -1px var(--btn-cast);
+}
+
+.btn3d:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.btn3d:disabled,
+.btn3d[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+  filter: none;
+  box-shadow:
+    inset 0 1px 0 var(--btn-gloss),
+    0 2px 0 var(--btn-edge);
+}
+
+/* Interruptor ligado: fica afundado enquanto estiver ativo. */
+.btn3d[aria-pressed="true"],
+.btn3d[data-ativo="true"] {
+  transform: translateY(calc(var(--btn-depth) - 1px));
+  box-shadow:
+    inset 0 2px 4px var(--btn-shade),
+    0 1px 0 var(--btn-edge);
+}
+
+/* --- Variantes ---------------------------------------------------------- */
+.btn3d--primary {
+  --btn-face: var(--accent);
+  --btn-ink: var(--btn-primary-ink);
+  --btn-edge: color-mix(in oklab, var(--accent) 62%, #000);
+}
+
+.btn3d--surface {
+  --btn-face: var(--surface);
+  --btn-ink: var(--foreground);
+  --btn-edge: color-mix(in oklab, var(--border) 82%, #000);
+}
+
+.btn3d--soft {
+  --btn-face: var(--accent-soft);
+  --btn-ink: var(--accent);
+  --btn-edge: color-mix(in oklab, var(--accent-soft) 70%, #000);
+}
+
+.btn3d--danger {
+  --btn-face: var(--danger);
+  --btn-ink: #ffffff;
+  --btn-edge: color-mix(in oklab, var(--danger) 62%, #000);
+}
+
+.btn3d--ghost {
+  --btn-face: color-mix(in oklab, var(--surface) 55%, transparent);
+  --btn-ink: var(--muted);
+  --btn-depth: 2px;
+  --btn-edge: color-mix(in oklab, var(--border) 88%, #000);
+}
+
+.btn3d--ghost:hover:not(:disabled) {
+  --btn-ink: var(--foreground);
+}
+
+/* --- Tamanhos ----------------------------------------------------------- */
+.btn3d--lg {
+  --btn-depth: 5px;
+  padding: 0.95rem 1.75rem;
+  font-size: 1rem;
+}
+
+.btn3d--sm {
+  --btn-depth: 3px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8125rem;
+}
+
+.btn3d--chip {
+  --btn-depth: 2px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.btn3d--icon {
+  --btn-depth: 3px;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 9999px;
+}
+
+.btn3d--block {
+  display: flex;
+  width: 100%;
+}
+
+/* Marcador redondo de "concluir": mesma física, sem face colorida. */
+.dot3d {
+  border-radius: 9999px;
+  background-image: linear-gradient(180deg, var(--surface), color-mix(in oklab, var(--surface) 92%, #000));
+  box-shadow:
+    inset 0 1px 0 var(--btn-gloss),
+    0 2px 0 color-mix(in oklab, var(--border) 80%, #000),
+    0 3px 5px -2px var(--btn-cast);
+  transition:
+    transform 120ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 120ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.dot3d:hover {
+  transform: translateY(-1px);
+}
+
+.dot3d:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 3px var(--btn-shade);
+}
+
+/* Quem pediu menos movimento continua vendo o relevo, mas sem o salto. */
+@media (prefers-reduced-motion: reduce) {
+  .btn3d {
+    transition: none;
+  }
+  .btn3d:hover:not(:disabled),
+  .dot3d:hover {
+    transform: none;
+  }
 }
