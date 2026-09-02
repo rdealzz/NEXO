@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { store } from "@/lib/db";
-import { analyzeCapture, isConfigured, UnsupportedFileError } from "@/lib/nexo/extract";
-import { suggestFollowUps } from "@/lib/nexo/rules";
+import { isConfigured, UnsupportedFileError } from "@/lib/nexo/extract";
+import { ingest } from "@/lib/nexo/ingest";
 import { CaptureKindSchema, type CaptureKind } from "@/lib/nexo/schema";
 import { attachOwner, currentOwner } from "@/lib/owner";
 
@@ -26,6 +25,7 @@ export async function POST(request: Request) {
   let text: string | undefined;
   let followUp: string | undefined;
   let file: { base64: string; mediaType: string; name: string } | undefined;
+  let fileData: Uint8Array | undefined;
 
   const contentType = request.headers.get("content-type") ?? "";
   if (contentType.includes("multipart/form-data")) {
@@ -40,8 +40,9 @@ export async function POST(request: Request) {
       if (upload.size > MAX_FILE_BYTES) {
         return NextResponse.json({ error: "Arquivo acima de 10 MB." }, { status: 413 });
       }
+      fileData = new Uint8Array(await upload.arrayBuffer());
       file = {
-        base64: Buffer.from(await upload.arrayBuffer()).toString("base64"),
+        base64: Buffer.from(fileData).toString("base64"),
         mediaType: upload.type,
         name: upload.name,
       };
@@ -59,20 +60,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const analysis = await analyzeCapture({ kind, text, file, followUp });
-    const capture = await store().createCapture(owner.id, {
-      kind,
-      summary: analysis.summary,
-      raw_text: text?.trim() ?? null,
-      file_name: file?.name ?? null,
-      analysis,
+    // Dentro do app nada é criado sem a tela de revisão confirmar.
+    const result = await ingest({
+      ownerId: owner.id,
+      input: { kind, text, file, followUp },
+      fileData,
+      autoCreate: false,
     });
 
     return attachOwner(
       NextResponse.json({
-        capture_id: capture.id,
-        analysis,
-        follow_ups: suggestFollowUps(analysis),
+        capture_id: result.capture.id,
+        analysis: result.analysis,
+        follow_ups: result.followUps,
       }),
       owner,
     );

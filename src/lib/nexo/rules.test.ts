@@ -1,17 +1,23 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { suggestFollowUps } from "./rules.ts";
-import type { CaptureAnalysis } from "./schema.ts";
+import { mergeFollowUps, suggestFollowUps } from "./rules";
 
-function analysis(over: Partial<CaptureAnalysis> = {}): CaptureAnalysis {
+// Tipada a partir da própria função: evita duas identidades do mesmo tipo
+// quando o runner importa com extensão e o app sem.
+type Analysis = Parameters<typeof suggestFollowUps>[0];
+
+function analysis(over: Partial<Analysis> = {}): Analysis {
   return {
     understood: true,
     summary: "Nota fiscal de uma geladeira",
     category: "garantia",
     entity: { kind: "eletrodomestico", name: "Geladeira Brastemp Inverse", identifier: null },
     amount_brl: 4299.9,
+    purchase: null,
     reminders: [],
+    proactive_followups: [],
+    needs_confirmation: false,
     clarification: null,
     tags: [],
     ...over,
@@ -51,7 +57,7 @@ test("veículo conhece revisão, seguro, licenciamento e pneus", () => {
     "veiculo.revisao",
     "veiculo.seguro",
   ]);
-  assert.equal(found.find((f) => f.rule_id === "veiculo.revisao")?.repeat_months, 6);
+  assert.equal(found.find((f) => f.rule_id === "veiculo.revisao")?.repeat_rule, "meses:6");
 });
 
 test("kind com acento e espaço ainda encontra a regra", () => {
@@ -71,4 +77,38 @@ test("sem entidade conhecida não inventa sugestão", () => {
 
 test("sugestão que cairia no passado é descartada", () => {
   assert.deepEqual(suggestFollowUps(analysis(), "2020-01-01"), []);
+});
+
+test("sugestão do modelo entra quando a tabela não cobre", () => {
+  const chuveiro = analysis({
+    entity: { kind: "eletronico", name: "Chuveiro Lorenzetti", identifier: null },
+  });
+  const merged = mergeFollowUps(
+    suggestFollowUps(chuveiro, "2026-10-01"),
+    [{ title: "Trocar a resistência", suggested_date: "2027-04-01", why: "resistência dura cerca de 6 meses" }],
+    "2026-10-01",
+  );
+  assert.deepEqual(merged.map((f) => f.rule_id), ["eletronico.garantia", "modelo.0"]);
+});
+
+test("sugestão do modelo que repete a tabela é descartada", () => {
+  const rules = suggestFollowUps(analysis(), "2026-10-01");
+  const merged = mergeFollowUps(
+    rules,
+    [{ title: "Fim da garantia do fabricante", suggested_date: "2028-01-01", why: "duplicata" }],
+    "2026-10-01",
+  );
+  assert.equal(merged.length, rules.length);
+});
+
+test("sugestão do modelo com data ruim ou no passado é descartada", () => {
+  const merged = mergeFollowUps(
+    [],
+    [
+      { title: "Coisa vaga", suggested_date: "em breve", why: "x" },
+      { title: "Outra coisa", suggested_date: "2020-01-01", why: "x" },
+    ],
+    "2026-10-01",
+  );
+  assert.deepEqual(merged, []);
 });

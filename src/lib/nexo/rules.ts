@@ -1,6 +1,6 @@
 import { addDays, addMonths, format, parseISO } from "date-fns";
 
-import type { Category, CaptureAnalysis } from "./schema";
+import { LEAD, type Category, type CaptureAnalysis, type ProactiveFollowUp } from "./schema";
 
 /**
  * A segunda metade da promessa do NEXO: além de entender o que você mandou,
@@ -9,15 +9,16 @@ import type { Category, CaptureAnalysis } from "./schema";
  */
 
 export type FollowUp = {
+  /** `veiculo.revisao` para a tabela, `modelo.N` para o que veio do modelo. */
   rule_id: string;
   title: string;
   due_date: string;
-  lead_days: number[];
+  lead_minutes: number[];
   category: Category;
   /** O texto que o app mostra no card de sugestão. */
   pitch: string;
-  /** Meses entre repetições, quando é algo que volta sempre. */
-  repeat_months: number | null;
+  /** Regra de recorrência ("meses:6") quando é algo que volta sempre. */
+  repeat_rule: string | null;
 };
 
 type Rule = {
@@ -27,7 +28,7 @@ type Rule = {
   days?: number;
   title: (subject: string) => string;
   pitch: (subject: string) => string;
-  lead_days: number[];
+  lead_minutes: number[];
   category: Category;
   repeat_months?: number;
   /** Só dispara quando o nome da entidade bate. */
@@ -41,7 +42,7 @@ const RULES: Record<string, Rule[]> = {
       months: 6,
       title: (s) => `Revisão / troca de óleo — ${s}`,
       pitch: (s) => `Carro costuma pedir óleo a cada 6 meses. Quer que eu lembre da revisão do ${s}?`,
-      lead_days: [7],
+      lead_minutes: [LEAD.umaSemana],
       category: "veiculo",
       repeat_months: 6,
     },
@@ -50,7 +51,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Renovar seguro — ${s}`,
       pitch: () => "Seguro vence em 12 meses. Aviso 30 dias antes para você cotar com calma?",
-      lead_days: [30, 7],
+      lead_minutes: [LEAD.trintaDias, LEAD.umaSemana],
       category: "veiculo",
       repeat_months: 12,
     },
@@ -59,7 +60,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Licenciamento anual — ${s}`,
       pitch: () => "Licenciamento é anual e a multa por atraso é cara. Quer o lembrete?",
-      lead_days: [30],
+      lead_minutes: [LEAD.trintaDias],
       category: "veiculo",
       repeat_months: 12,
     },
@@ -68,7 +69,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Rodízio e calibragem dos pneus — ${s}`,
       pitch: () => "Rodízio de pneus a cada 12 mil km / 1 ano. Coloco na agenda?",
-      lead_days: [7],
+      lead_minutes: [LEAD.umaSemana],
       category: "veiculo",
       repeat_months: 12,
     },
@@ -79,7 +80,7 @@ const RULES: Record<string, Rule[]> = {
       days: 90,
       title: (s) => `Fim da garantia legal — ${s}`,
       pitch: () => "Os 90 dias de garantia legal terminam antes da garantia do fabricante. Testo com você antes?",
-      lead_days: [7],
+      lead_minutes: [LEAD.umaSemana],
       category: "garantia",
     },
     {
@@ -87,7 +88,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Fim da garantia do fabricante — ${s}`,
       pitch: (s) => `A garantia do ${s} acaba em 12 meses. Aviso 30 dias antes?`,
-      lead_days: [30, 7],
+      lead_minutes: [LEAD.trintaDias, LEAD.umaSemana],
       category: "garantia",
     },
     {
@@ -95,7 +96,7 @@ const RULES: Record<string, Rule[]> = {
       months: 6,
       title: (s) => `Trocar o filtro — ${s}`,
       pitch: () => "Filtro de água pede troca a cada 6 meses. Quer lembrete recorrente?",
-      lead_days: [7],
+      lead_minutes: [LEAD.umaSemana],
       category: "casa",
       repeat_months: 6,
       when: /geladeira|refrigerador|purificador|bebedouro|filtro/i,
@@ -105,7 +106,7 @@ const RULES: Record<string, Rule[]> = {
       months: 6,
       title: (s) => `Limpeza do ar-condicionado — ${s}`,
       pitch: () => "Ar-condicionado precisa de higienização a cada 6 meses. Marco?",
-      lead_days: [7],
+      lead_minutes: [LEAD.umaSemana],
       category: "casa",
       repeat_months: 6,
       when: /ar.?condicionado|split|climatizador/i,
@@ -117,7 +118,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Fim da garantia — ${s}`,
       pitch: (s) => `Guardo o fim da garantia do ${s} para você não descobrir tarde demais?`,
-      lead_days: [30, 7],
+      lead_minutes: [LEAD.trintaDias, LEAD.umaSemana],
       category: "garantia",
     },
   ],
@@ -127,7 +128,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: () => "IPTU do ano que vem",
       pitch: () => "IPTU é anual e a cota única costuma ter desconto. Aviso quando abrir?",
-      lead_days: [30],
+      lead_minutes: [LEAD.trintaDias],
       category: "casa",
       repeat_months: 12,
     },
@@ -136,7 +137,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: () => "Renovar seguro incêndio",
       pitch: () => "Seguro incêndio vence junto com o contrato. Quer o lembrete?",
-      lead_days: [30],
+      lead_minutes: [LEAD.trintaDias],
       category: "casa",
       repeat_months: 12,
     },
@@ -147,7 +148,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Renovar ${s}`,
       pitch: () => "Apólice renova em 12 meses — e cotar antes costuma baixar o preço. Aviso 30 dias antes?",
-      lead_days: [30, 7],
+      lead_minutes: [LEAD.trintaDias, LEAD.umaSemana],
       category: "financeiro",
       repeat_months: 12,
     },
@@ -158,7 +159,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Reajuste anual — ${s}`,
       pitch: () => "O reajuste do plano cai no aniversário do contrato. Quer conferir antes?",
-      lead_days: [30],
+      lead_minutes: [LEAD.trintaDias],
       category: "saude",
       repeat_months: 12,
     },
@@ -169,7 +170,7 @@ const RULES: Record<string, Rule[]> = {
       days: -1,
       title: (s) => `Check-in aberto — ${s}`,
       pitch: () => "Check-in abre 24h antes e é onde se escolhe assento. Aviso na hora?",
-      lead_days: [0],
+      lead_minutes: [LEAD.naHora],
       category: "viagem",
     },
     {
@@ -177,7 +178,7 @@ const RULES: Record<string, Rule[]> = {
       days: -7,
       title: (s) => `Conferir documentos da viagem — ${s}`,
       pitch: () => "Uma semana antes ainda dá tempo de resolver documento. Quer esse aviso?",
-      lead_days: [0],
+      lead_minutes: [LEAD.naHora],
       category: "viagem",
     },
   ],
@@ -187,7 +188,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Renovação automática — ${s}`,
       pitch: (s) => `A ${s} renova sozinha. Aviso 7 dias antes para você decidir se continua?`,
-      lead_days: [7],
+      lead_minutes: [LEAD.umaSemana],
       category: "assinatura",
       repeat_months: 12,
     },
@@ -198,7 +199,7 @@ const RULES: Record<string, Rule[]> = {
       months: 12,
       title: (s) => `Vacina anual — ${s}`,
       pitch: () => "Vacina de reforço é anual. Marco?",
-      lead_days: [14],
+      lead_minutes: [2 * LEAD.umaSemana],
       category: "saude",
       repeat_months: 12,
     },
@@ -207,7 +208,7 @@ const RULES: Record<string, Rule[]> = {
       months: 6,
       title: (s) => `Vermífugo — ${s}`,
       pitch: () => "Vermífugo a cada 6 meses. Quer lembrete recorrente?",
-      lead_days: [3],
+      lead_minutes: [LEAD.tresDias],
       category: "saude",
       repeat_months: 6,
     },
@@ -256,12 +257,54 @@ export function suggestFollowUps(analysis: CaptureAnalysis, anchorDate?: string)
         rule_id: rule.id,
         title: rule.title(subject),
         due_date: format(due, "yyyy-MM-dd"),
-        lead_days: rule.lead_days,
+        lead_minutes: rule.lead_minutes,
         category: rule.category,
         pitch: rule.pitch(subject),
-        repeat_months: rule.repeat_months ?? null,
+        repeat_rule: rule.repeat_months ? `meses:${rule.repeat_months}` : null,
       } satisfies FollowUp;
     })
     // Não sugerir algo que já saiu da própria captura, nem coisa no passado.
     .filter((f) => !alreadyThere.has(f.due_date) && f.due_date >= format(new Date(), "yyyy-MM-dd"));
+}
+
+function normalizeTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Junta as duas fontes de sugestão: a tabela cobre o que se repete e é sempre
+ * igual; o modelo cobre a cauda longa que nenhuma tabela alcança. A tabela tem
+ * precedência — quando as duas falam da mesma coisa, fica a versão que sabe
+ * repetir sozinha.
+ */
+export function mergeFollowUps(fromRules: FollowUp[], fromModel: ProactiveFollowUp[], today: string): FollowUp[] {
+  const seen = new Set(fromRules.map((f) => normalizeTitle(f.title)));
+  const seenDates = new Set(fromRules.map((f) => f.due_date));
+
+  const modelBased = fromModel.flatMap<FollowUp>((suggestion, index) => {
+    const title = normalizeTitle(suggestion.title);
+    const overlaps = [...seen].some((known) => known.includes(title) || title.includes(known));
+    if (overlaps || seenDates.has(suggestion.suggested_date)) return [];
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(suggestion.suggested_date) || suggestion.suggested_date <= today) return [];
+
+    seen.add(title);
+    return [
+      {
+        rule_id: `modelo.${index}`,
+        title: suggestion.title,
+        due_date: suggestion.suggested_date,
+        lead_minutes: [LEAD.umaSemana],
+        category: "outro" as Category,
+        pitch: suggestion.why,
+        repeat_rule: null,
+      },
+    ];
+  });
+
+  return [...fromRules, ...modelBased];
 }

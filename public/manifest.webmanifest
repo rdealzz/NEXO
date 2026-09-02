@@ -1,0 +1,13 @@
+{
+  "name": "NEXO — Joga aqui. Eu lembro.",
+  "short_name": "NEXO",
+  "description": "Jogue aqui qualquer coisa que você não quer esquecer. O NEXO entende e avisa na hora certa.",
+  "start_url": "/inbox",
+  "display": "standalone",
+  "background_color": "#f7f7f5",
+  "theme_color": "#146b4f",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -1,23 +1,40 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { DropArea, type CapturePayload } from "@/components/drop-area";
-import { ReminderList } from "@/components/reminder-list";
+import { ReminderList, type Aba } from "@/components/reminder-list";
 import { ReviewCard, type ConfirmedDraft } from "@/components/review-card";
 import type { Reminder } from "@/lib/db";
+import { daysUntil } from "@/lib/format";
 import type { FollowUp } from "@/lib/nexo/rules";
 import type { CaptureAnalysis } from "@/lib/nexo/schema";
 
 type Draft = { captureId: string; analysis: CaptureAnalysis; followUps: FollowUp[] };
 
+const ABAS: { id: Aba; label: string }[] = [
+  { id: "hoje", label: "Hoje" },
+  { id: "proximos", label: "Próximos" },
+  { id: "caixa", label: "Caixa de entrada" },
+];
+
 export function InboxClient({ initialReminders }: { initialReminders: Reminder[] }) {
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
+  const [aba, setAba] = useState<Aba>("hoje");
   const [draft, setDraft] = useState<Draft | null>(null);
   const [lastPayload, setLastPayload] = useState<CapturePayload | null>(null);
   const [busy, setBusy] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const contagem = useMemo(() => {
+    const pendentes = reminders.filter((r) => r.status === "pendente");
+    return {
+      hoje: pendentes.filter((r) => r.due_date && daysUntil(r.due_date) <= 0).length,
+      proximos: pendentes.filter((r) => r.due_date && daysUntil(r.due_date) > 0).length,
+      caixa: pendentes.filter((r) => r.due_date === null).length,
+    } satisfies Record<Aba, number>;
+  }, [reminders]);
 
   const runCapture = useCallback(async (payload: CapturePayload, followUp?: string) => {
     setBusy(true);
@@ -53,8 +70,13 @@ export function InboxClient({ initialReminders }: { initialReminders: Reminder[]
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "Não consegui salvar.");
-      setReminders((current) => [...current, ...body.reminders]);
+
+      const criados = body.reminders as Reminder[];
+      setReminders((current) => [...current, ...criados]);
       setDraft(null);
+      // Leva a pessoa para onde a coisa caiu, senão parece que sumiu.
+      if (criados.some((r) => r.due_date === null)) setAba("caixa");
+      else if (criados.some((r) => r.due_date && daysUntil(r.due_date) > 0)) setAba("proximos");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Não consegui salvar.");
     } finally {
@@ -65,9 +87,8 @@ export function InboxClient({ initialReminders }: { initialReminders: Reminder[]
   async function patch(id: string, change: Record<string, unknown>) {
     const previous = reminders;
     // Otimista: a lista responde na hora, o servidor confirma depois.
-    setReminders((current) =>
-      current.map((r) => (r.id === id ? { ...r, ...(change as Partial<Reminder>) } : r)),
-    );
+    setReminders((current) => current.map((r) => (r.id === id ? { ...r, ...(change as Partial<Reminder>) } : r)));
+
     const response = await fetch(`/api/reminders/${id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
@@ -118,10 +139,30 @@ export function InboxClient({ initialReminders }: { initialReminders: Reminder[]
         />
       )}
 
+      <nav className="flex gap-1 border-b border-line">
+        {ABAS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setAba(item.id)}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm transition-colors ${
+              aba === item.id
+                ? "border-accent font-medium text-foreground"
+                : "border-transparent text-muted hover:text-foreground"
+            }`}
+          >
+            {item.label}
+            {contagem[item.id] > 0 && <span className="ml-1.5 text-xs text-muted">{contagem[item.id]}</span>}
+          </button>
+        ))}
+      </nav>
+
       <ReminderList
+        aba={aba}
         reminders={reminders}
         onComplete={(id) => patch(id, { status: "concluido" })}
-        onSnooze={(id, days) => patch(id, { snooze_days: days })}
+        onSnooze={(id, minutes) => patch(id, { snooze_minutes: minutes })}
+        onSchedule={(id, dueDate) => patch(id, { due_date: dueDate })}
         onDelete={remove}
       />
     </div>

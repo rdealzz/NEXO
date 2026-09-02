@@ -105,7 +105,7 @@ export function DropArea({ busy, onCapture }: Props) {
       }`}
     >
       <label htmlFor="nexo-drop" className="block text-sm font-medium text-muted">
-        Joga aqui.
+        O que você não quer esquecer?
       </label>
 
       <textarea
@@ -117,7 +117,7 @@ export function DropArea({ busy, onCapture }: Props) {
         }}
         rows={3}
         disabled={busy}
-        placeholder="Cole o e-mail, o print, a mensagem da sua mãe. Ou arraste um boleto."
+        placeholder="Escreva, cole um print, arraste um boleto. Ou fale."
         className="mt-2 w-full resize-none bg-transparent text-base outline-none placeholder:text-muted/60 disabled:opacity-50"
       />
 

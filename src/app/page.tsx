@@ -1,22 +1,11 @@
 import Link from "next/link";
 
 const EXEMPLOS = [
-  {
-    entrada: "Foto de um boleto",
-    saida: "Vence 15/09. Te aviso dia 12 e no dia.",
-  },
-  {
-    entrada: "E-mail: “sua garantia termina em 30 dias”",
-    saida: "Aviso 7 dias antes de acabar a garantia.",
-  },
-  {
-    entrada: "Áudio do mecânico: “troca o óleo daqui 6 meses”",
-    saida: "Lembrete criado para 02/03/2027.",
-  },
-  {
-    entrada: "Print do WhatsApp da sua mãe",
-    saida: "Marcar médico — quinta, 9h.",
-  },
+  { entrada: "Foto da nota fiscal da TV", saida: "Garantia até 02/09/2027. Aviso 30 dias antes?" },
+  { entrada: "Foto de um boleto", saida: "Vence 10/09. Aviso dia 7 e no dia." },
+  { entrada: "Áudio do mecânico: “troca o óleo daqui 6 meses”", saida: "Lembrete criado para 02/03/2027." },
+  { entrada: "Print do WhatsApp da sua mãe", saida: "Marcar médico — quinta, 9h." },
+  { entrada: "“Comprar tinta para casa”", saida: "Sem data: foi para a caixa de entrada." },
 ];
 
 export default function Home() {
@@ -25,22 +14,27 @@ export default function Home() {
       <p className="text-sm font-semibold tracking-tight text-accent">NEXO</p>
 
       <h1 className="mt-3 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-        Você não precisa lembrar.
+        Joga aqui.
         <br />
-        Só precisa mandar pra cá.
+        Eu lembro.
       </h1>
 
       <p className="mt-5 max-w-xl text-lg text-muted">
-        Uma foto, um áudio, um print, um PDF, um e-mail encaminhado. O NEXO lê, entende o que precisa acontecer e
-        avisa você na hora certa. Sem você cadastrar tarefa nenhuma.
+        Uma foto, um áudio, um print, um PDF, um e-mail encaminhado, ou só uma frase. O NEXO lê, entende o que
+        precisa acontecer e avisa você na hora certa. Você não cadastra tarefa nenhuma.
       </p>
 
-      <Link
-        href="/inbox"
-        className="mt-8 inline-block rounded-full bg-accent px-6 py-3 text-sm font-semibold text-background"
-      >
-        Jogar a primeira coisa aqui
-      </Link>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <Link href="/inbox" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-background">
+          Começar
+        </Link>
+        <Link
+          href="/entrar"
+          className="rounded-full border border-line px-6 py-3 text-sm font-semibold text-muted hover:text-foreground"
+        >
+          Entrar
+        </Link>
+      </div>
 
       <section className="mt-16">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">Como funciona na prática</h2>
@@ -70,19 +64,15 @@ export default function Home() {
           E ele lembra o que você normalmente esquece
         </h2>
         <p className="mt-3 leading-relaxed">
-          Você manda a nota da geladeira. Ele guarda o fim da garantia — e depois pergunta se quer lembrete do filtro
-          a cada 6 meses. Mandou o documento do carro? Ele já conhece IPVA, licenciamento, seguro, revisão e pneus.
+          Você fotografa a nota da geladeira. Ele guarda o fim da garantia — e depois pergunta se quer lembrete do
+          filtro a cada 6 meses. Mandou o documento do carro? Ele já conhece revisão, seguro, licenciamento e pneus.
         </p>
         <p className="mt-3 text-sm text-muted">
           Você não precisa pensar “o que eu preciso lembrar?”. Essa parte é com ele.
         </p>
       </section>
 
-      <footer className="mt-16 text-sm text-muted">
-        <Link href="/inbox" className="underline underline-offset-4 hover:text-foreground">
-          Abrir minha caixa
-        </Link>
-      </footer>
+      <p className="mt-14 text-center text-lg font-medium">Pensou → mandou → esqueceu → NEXO lembra.</p>
     </main>
   );
 }

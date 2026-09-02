@@ -2,20 +2,20 @@
 
 import { useState } from "react";
 
-import { CATEGORY_LABEL, humanDate, humanLead } from "@/lib/format";
+import { CATEGORY_LABEL, humanDate, humanLead, humanRepeat } from "@/lib/format";
 import type { FollowUp } from "@/lib/nexo/rules";
 import type { CaptureAnalysis } from "@/lib/nexo/schema";
 
 export type ConfirmedDraft = {
   title: string;
-  due_date: string;
+  due_date: string | null;
   due_time: string | null;
-  lead_days: number[];
+  lead_minutes: number[];
+  repeat_rule: string | null;
   category: string;
   why: string | null;
   confidence: number | null;
   entity_name: string | null;
-  repeat_months: number | null;
   capture_id: string | null;
 };
 
@@ -34,21 +34,21 @@ type Props = {
 function buildRows(captureId: string, analysis: CaptureAnalysis, followUps: FollowUp[]): Row[] {
   const entity = analysis.entity?.name?.trim() || null;
 
+  // O que estava no material vem marcado: é isso que a pessoa mandou.
   const extracted: Row[] = analysis.reminders.map((reminder, index) => ({
     key: `r${index}`,
-    // O que estava no material vem marcado: é isso que a pessoa mandou.
     selected: true,
     pitch: null,
     uncertain: reminder.confidence < 0.6,
     title: reminder.title,
     due_date: reminder.due_date,
     due_time: reminder.due_time,
-    lead_days: reminder.lead_days,
+    lead_minutes: reminder.lead_minutes,
+    repeat_rule: reminder.repeat_rule,
     category: reminder.category,
     why: reminder.why,
     confidence: reminder.confidence,
     entity_name: entity,
-    repeat_months: null,
     capture_id: captureId,
   }));
 
@@ -61,12 +61,12 @@ function buildRows(captureId: string, analysis: CaptureAnalysis, followUps: Foll
     title: followUp.title,
     due_date: followUp.due_date,
     due_time: null,
-    lead_days: followUp.lead_days,
+    lead_minutes: followUp.lead_minutes,
+    repeat_rule: followUp.repeat_rule,
     category: followUp.category,
     why: followUp.pitch,
     confidence: null,
     entity_name: entity,
-    repeat_months: followUp.repeat_months,
     capture_id: captureId,
   }));
 
@@ -81,12 +81,14 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
     setRows((current) => current.map((row) => (row.key === key ? { ...row, ...change } : row)));
 
   const chosen = rows.filter((row) => row.selected);
+  const compra = analysis.purchase;
 
   return (
     <section className="rounded-2xl border border-line bg-surface p-4 sm:p-5">
       <header className="flex items-start gap-3">
         <div className="min-w-0">
-          <p className="text-base font-medium">{analysis.summary}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent">Encontrei algo importante</p>
+          <p className="mt-1 text-base font-medium">{analysis.summary}</p>
           <p className="mt-0.5 text-sm text-muted">
             {CATEGORY_LABEL[analysis.category]}
             {analysis.entity?.name ? ` · ${analysis.entity.name}` : ""}
@@ -95,14 +97,29 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
               : ""}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onDiscard}
-          className="ml-auto shrink-0 text-sm text-muted hover:text-foreground"
-        >
+        <button type="button" onClick={onDiscard} className="ml-auto shrink-0 text-sm text-muted hover:text-foreground">
           descartar
         </button>
       </header>
+
+      {compra && (
+        <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl bg-accent-soft/60 p-3 text-sm">
+          <Campo termo="Produto" valor={[compra.brand, compra.product, compra.model].filter(Boolean).join(" ")} />
+          <Campo termo="Loja" valor={compra.store} />
+          <Campo termo="Comprado em" valor={compra.purchased_on ? humanDate(compra.purchased_on) : null} />
+          <Campo
+            termo="Valor"
+            valor={
+              compra.amount_brl?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) ?? null
+            }
+          />
+          <Campo termo="Nota" valor={compra.invoice_number} />
+          <Campo
+            termo="Garantia até"
+            valor={compra.warranty_until ? humanDate(compra.warranty_until) : null}
+          />
+        </dl>
+      )}
 
       {analysis.clarification && (
         <div className="mt-4 rounded-xl bg-accent-soft p-3">
@@ -160,8 +177,8 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted">
                     <input
                       type="date"
-                      value={row.due_date}
-                      onChange={(event) => patch(row.key, { due_date: event.target.value })}
+                      value={row.due_date ?? ""}
+                      onChange={(event) => patch(row.key, { due_date: event.target.value || null })}
                       className="rounded border border-line bg-surface px-2 py-1"
                     />
                     <input
@@ -170,9 +187,9 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
                       onChange={(event) => patch(row.key, { due_time: event.target.value || null })}
                       className="rounded border border-line bg-surface px-2 py-1"
                     />
-                    <span>· {humanDate(row.due_date)}</span>
-                    <span>· aviso {humanLead(row.lead_days)}</span>
-                    {row.repeat_months && <span>· repete a cada {row.repeat_months} meses</span>}
+                    <span>· {row.due_date ? humanDate(row.due_date) : "vai para a caixa de entrada"}</span>
+                    {row.due_date && <span>· aviso {humanLead(row.lead_minutes)}</span>}
+                    {humanRepeat(row.repeat_rule) && <span>· {humanRepeat(row.repeat_rule)}</span>}
                   </div>
 
                   {row.uncertain && (
@@ -195,13 +212,19 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
           disabled={chosen.length === 0 || saving}
           className="mt-4 w-full rounded-full bg-accent py-2.5 text-sm font-semibold text-background disabled:opacity-40"
         >
-          {saving
-            ? "Salvando…"
-            : chosen.length === 1
-              ? "Criar 1 lembrete"
-              : `Criar ${chosen.length} lembretes`}
+          {saving ? "Salvando…" : chosen.length === 1 ? "Confirmar" : `Confirmar ${chosen.length} itens`}
         </button>
       )}
     </section>
+  );
+}
+
+function Campo({ termo, valor }: { termo: string; valor: string | null }) {
+  if (!valor) return null;
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs text-muted">{termo}</dt>
+      <dd className="truncate font-medium">{valor}</dd>
+    </div>
   );
 }

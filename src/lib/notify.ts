@@ -7,12 +7,17 @@ import type { Reminder } from "./db";
  */
 export type Delivery = { reminder_id: string; lead: number; channel: string; ok: boolean; error?: string };
 
-function messageFor(reminder: Reminder, lead: number): string {
-  if (lead === 0) {
-    return reminder.due_time ? `Hoje às ${reminder.due_time}: ${reminder.title}` : `Hoje: ${reminder.title}`;
+/** O texto que a pessoa lê na notificação. `lead` está em minutos. */
+export function messageFor(reminder: Reminder, lead: number): string {
+  if (lead === 0) return reminder.due_time ? `Agora (${reminder.due_time}): ${reminder.title}` : reminder.title;
+  if (lead < 60) return `Em ${lead} min: ${reminder.title}`;
+  if (lead < 1440) {
+    const horas = Math.round(lead / 60);
+    return `Em ${horas} ${horas === 1 ? "hora" : "horas"}: ${reminder.title}`;
   }
-  if (lead === 1) return `Amanhã: ${reminder.title}`;
-  return `Em ${lead} dias: ${reminder.title}`;
+  const dias = Math.round(lead / 1440);
+  if (dias === 1) return `Amanhã: ${reminder.title}`;
+  return `Em ${dias} dias: ${reminder.title}`;
 }
 
 export async function deliver(reminder: Reminder, lead: number): Promise<Delivery> {
@@ -36,7 +41,7 @@ export async function deliver(reminder: Reminder, lead: number): Promise<Deliver
         due_date: reminder.due_date,
         due_time: reminder.due_time,
         category: reminder.category,
-        lead_days: lead,
+        lead_minutes: lead,
       }),
     });
     return {

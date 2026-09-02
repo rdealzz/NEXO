@@ -3,9 +3,12 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NEXO — você não precisa lembrar",
+  title: "NEXO — Joga aqui. Eu lembro.",
   description:
-    "Jogue aqui qualquer coisa que não pode esquecer: uma foto, um áudio, um print, um PDF. O NEXO entende o que precisa acontecer e avisa você na hora certa.",
+    "Jogue aqui qualquer coisa que não pode esquecer: uma foto, um áudio, um print, um PDF, um e-mail. O NEXO entende o que precisa acontecer e avisa você na hora certa.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "NEXO", statusBarStyle: "default" },
+  icons: { icon: "/icone.svg", apple: "/icone.svg" },
 };
 
 export const viewport: Viewport = {
