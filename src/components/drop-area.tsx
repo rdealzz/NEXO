@@ -2,8 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Camera } from "@/components/permissoes/camera";
+import { ModalPermissao } from "@/components/permissoes/modal-permissao";
 import { Botao } from "@/components/ui/button";
 import type { CaptureKind } from "@/lib/nexo/schema";
+import {
+  cameraDisponivel,
+  estadoDaCamera,
+  jaExplicada,
+  marcarExplicada,
+  type Permissao,
+} from "@/lib/permissoes";
 
 export type CapturePayload = { kind: CaptureKind; text?: string; file?: File };
 
@@ -25,7 +34,12 @@ export function DropArea({ busy, onCapture }: Props) {
   const [pending, setPending] = useState<File | null>(null);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
+  // O pedido de permissão em curso: qual, e se é para explicar ou para ensinar
+  // o caminho de volta depois de o sistema ter negado.
+  const [pedido, setPedido] = useState<{ permissao: Permissao; modo: "explicar" | "bloqueada" } | null>(null);
+  const [cameraAberta, setCameraAberta] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const galeriaInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
   const recognition = useRef<SpeechRecognitionLike | null>(null);
 
@@ -42,6 +56,60 @@ export function DropArea({ busy, onCapture }: Props) {
       setText("");
     }
   }, [busy, onCapture, pending, text]);
+
+  /**
+   * Foto direto da câmera: manda na hora.
+   *
+   * A pessoa acabou de enquadrar e disparar — parar para ela tocar em "Mandar"
+   * só adiciona um passo entre pensar e poder esquecer.
+   */
+  const fotografou = useCallback(
+    (arquivo: File) => {
+      setCameraAberta(false);
+      onCapture({ kind: "imagem", file: arquivo });
+    },
+    [onCapture],
+  );
+
+  /** Abre a câmera de verdade — só é chamado depois do aceite. */
+  const abrirCamera = useCallback(() => {
+    marcarExplicada("camera");
+    setPedido(null);
+    // Sem getUserMedia (navegador antigo, ou http), o app de câmera do sistema
+    // ainda resolve: o <input capture> abre ele.
+    if (cameraDisponivel()) setCameraAberta(true);
+    else cameraInput.current?.click();
+  }, []);
+
+  const abrirGaleria = useCallback(() => {
+    marcarExplicada("galeria");
+    setPedido(null);
+    galeriaInput.current?.click();
+  }, []);
+
+  /**
+   * O toque em Câmera nunca aciona o hardware direto: ou a pessoa já aceitou a
+   * explicação antes (e o sistema já concedeu), ou ela vê a explicação primeiro.
+   */
+  async function pedirCamera() {
+    const estado = await estadoDaCamera();
+    if (estado === "negada") {
+      setPedido({ permissao: "camera", modo: "bloqueada" });
+      return;
+    }
+    if (estado === "concedida" && jaExplicada("camera")) {
+      abrirCamera();
+      return;
+    }
+    setPedido({ permissao: "camera", modo: "explicar" });
+  }
+
+  function pedirGaleria() {
+    // Não existe Permissions API para o seletor de arquivos: o que dá para
+    // lembrar é se já explicamos e a pessoa aceitou.
+    if (jaExplicada("galeria")) abrirGaleria();
+    else setPedido({ permissao: "galeria", modo: "explicar" });
+  }
 
   // Colar um print direto na página é o caminho mais curto que existe.
   useEffect(() => {
@@ -140,11 +208,14 @@ export function DropArea({ busy, onCapture }: Props) {
       {speechError && <p className="mb-3 text-sm text-[#e0483a]">{speechError}</p>}
 
       <div className="flex flex-wrap items-center gap-2">
+        <ToolButton onClick={pedirCamera} disabled={busy}>
+          Câmera
+        </ToolButton>
+        <ToolButton onClick={pedirGaleria} disabled={busy}>
+          Galeria
+        </ToolButton>
         <ToolButton onClick={() => fileInput.current?.click()} disabled={busy}>
           Arquivo
-        </ToolButton>
-        <ToolButton onClick={() => cameraInput.current?.click()} disabled={busy}>
-          Foto
         </ToolButton>
         <ToolButton onClick={toggleMic} disabled={busy} active={listening}>
           {listening ? "Ouvindo…" : "Falar"}
@@ -168,13 +239,45 @@ export function DropArea({ busy, onCapture }: Props) {
         onChange={(event) => setPending(event.target.files?.[0] ?? null)}
       />
       <input
+        ref={galeriaInput}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(event) => setPending(event.target.files?.[0] ?? null)}
+      />
+      {/* Só entra em cena quando não há getUserMedia: abre o app de câmera do sistema. */}
+      <input
         ref={cameraInput}
         type="file"
         accept="image/*"
         capture="environment"
         hidden
-        onChange={(event) => setPending(event.target.files?.[0] ?? null)}
+        onChange={(event) => {
+          const arquivo = event.target.files?.[0];
+          if (arquivo) fotografou(arquivo);
+        }}
       />
+
+      {pedido && (
+        <ModalPermissao
+          key={`${pedido.permissao}-${pedido.modo}`}
+          permissao={pedido.permissao}
+          modo={pedido.modo}
+          onAceitar={pedido.permissao === "camera" ? abrirCamera : abrirGaleria}
+          onFechar={() => setPedido(null)}
+        />
+      )}
+
+      {cameraAberta && (
+        <Camera
+          onFoto={fotografou}
+          onFechar={() => setCameraAberta(false)}
+          onNegada={() => {
+            setCameraAberta(false);
+            setPedido({ permissao: "camera", modo: "bloqueada" });
+          }}
+        />
+      )}
     </section>
   );
 }

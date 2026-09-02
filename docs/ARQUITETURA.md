@@ -29,7 +29,7 @@ src/components/
   ui/logo.tsx               ✅ símbolo, wordmark e lockup em React
   ui/tema.tsx               ✅ Etapa 2 — alternador Sol/Lua e escolha do tema
   onboarding/               ✅ Etapa 1 — fluxo, cards de ROI, paywall
-  permissoes/               ⬜ Etapa 3 — modais de câmera e galeria
+  permissoes/               ✅ Etapa 3 — explicação e câmera embutida
   legal/                    ⬜ Etapa 4 — banner de cookies, exclusão de conta
 
 src/lib/
@@ -37,6 +37,7 @@ src/lib/
   onboarding/roi.ts         ✅ Etapa 1 — quanto custa esquecer
   nexo/                     ✅ Etapa 5 — prompt, extração, regras preditivas
   db/                       ✅ store em memória (dev) e Supabase (produção)
+  permissoes.ts             ✅ Etapa 3 — justificativas e estado das permissões
   notify.ts                 ✅ entrega do aviso, já com a cara da marca
   tema.ts                   ✅ Etapa 2 — preferência de tema e script anti-flash
   assinatura/               ⬜ Etapa 6 — cliente do gateway e estado do plano
@@ -56,6 +57,24 @@ notificação chega no celular — que era o ponto: o aviso tem cara de NEXO.
 | `src/components/ui/logo.tsx` | dentro do app — acompanha o tema |
 
 Verde da marca `#146b4f`, luz `#7fecc0`, base creme `#fbf8f0`.
+
+## Permissões
+
+A ordem é sempre a mesma, e é a que Apple e Google exigem: **toque → nossa
+explicação → a pessoa aceita → só então a API nativa**. Um "Permitir?" que
+aparece do nada é negado, e no iOS uma permissão negada não volta a perguntar
+sozinha — por isso existe também o modo "bloqueada", que ensina o caminho de
+volta pelos ajustes em vez de deixar a pessoa presa.
+
+| Toque | O que acontece |
+| --- | --- |
+| Câmera | Explicação → `getUserMedia` → câmera embutida com moldura e disparo |
+| Galeria | Explicação → seletor de fotos do sistema |
+| Arquivo | Direto: escolher um PDF não usa permissão de fotos |
+
+Quem já aceitou não vê a explicação de novo (`nexo:permissao:*`), e quando o
+`getUserMedia` não existe (navegador antigo, ou http) o `<input capture>` abre
+o app de câmera do sistema.
 
 ## Tema
 
