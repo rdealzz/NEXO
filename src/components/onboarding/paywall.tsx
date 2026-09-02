@@ -1,3 +1,4 @@
+import { BotaoAssinar } from "@/components/assinatura/botao-assinar";
 import { BotaoLink } from "@/components/ui/button";
 import { brl, brlRedondo, PLANO, PRECO_ANUAL } from "@/lib/pricing";
 
@@ -14,7 +15,7 @@ const INCLUI = [
  * O paywall só aparece depois da conta de ROI — a pessoa chega aqui já sabendo
  * quanto o esquecimento custa a ela.
  */
-export function Paywall({ economia }: { economia: number }) {
+export function Paywall({ economia, autenticado = false }: { economia: number; autenticado?: boolean }) {
   const paga = economia >= PRECO_ANUAL;
 
   return (
@@ -48,16 +49,14 @@ export function Paywall({ economia }: { economia: number }) {
       </ul>
 
       <div className="mt-7 space-y-3">
-        <BotaoLink href={`/entrar?plano=${PLANO.id}`} variant="primary" size="lg" block>
-          Assinar por {brl(PLANO.precoMensal)}/mês
-        </BotaoLink>
+        <BotaoAssinar autenticado={autenticado} />
         <BotaoLink href="/inbox" variant="ghost" block>
           Quero testar antes de assinar
         </BotaoLink>
       </div>
 
       <p className="mt-4 text-center text-xs text-muted">
-        Cobrança mensal no cartão. Cancelamento em um clique, dentro do app.
+        Pix, boleto ou cartão. Renova todo mês, e o cancelamento é um clique dentro do app.
       </p>
     </section>
   );

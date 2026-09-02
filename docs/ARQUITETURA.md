@@ -23,7 +23,7 @@ src/app/
     push/inscrever          ✅ Etapa 5 — registra o aparelho para receber avisos
     inbound/{email,whatsapp}✅ entrada de fora do app
     conta/excluir           ✅ Etapa 4 — exclusão permanente da conta
-    assinatura/             ⬜ Etapa 6 — checkout e webhook do gateway
+    assinatura/             ✅ Etapa 6 — checkout, webhook e cancelamento
 
 src/components/
   ui/button.tsx             ✅ botões 3D (o relevo mora em globals.css)
@@ -43,7 +43,7 @@ src/lib/
   notify.ts                 ✅ entrega do aviso: push primeiro, webhook depois
   push.ts                   ✅ Etapa 5 — Web Push (VAPID) e limpeza de assinatura morta
   tema.ts                   ✅ Etapa 2 — preferência de tema e script anti-flash
-  assinatura/               ⬜ Etapa 6 — cliente do gateway e estado do plano
+  assinatura/               ✅ Etapa 6 — cliente do Asaas e regra de acesso
 ```
 
 ## A marca
@@ -60,6 +60,27 @@ notificação chega no celular — que era o ponto: o aviso tem cara de NEXO.
 | `src/components/ui/logo.tsx` | dentro do app — acompanha o tema |
 
 Verde da marca `#146b4f`, luz `#7fecc0`, base creme `#fbf8f0`.
+
+## Assinatura
+
+Gateway: **Asaas**. A razão é prática — no Brasil boa parte do público paga em
+Pix e boleto, e recusar esses meios é recusar assinatura. O `billingType` fica
+`UNDEFINED` para a pessoa escolher na hora.
+
+**O estado mora no nosso banco, não no gateway.** O app precisa responder "esta
+pessoa está em dia?" a cada requisição; perguntar isso ao Asaas toda vez seria
+lento, caro e frágil. O gateway avisa por webhook, nós guardamos o resultado.
+
+**Quem decide o acesso é `valid_until`, não `status`.** Quem cancela hoje pagou
+até o fim do mês e continua usando até lá — é o que os Termos prometem. E se o
+webhook parar de chegar, o acesso não fica aberto para sempre: a data vence
+sozinha. `src/lib/assinatura/acesso.test.ts` cobre os dois lados.
+
+**O webhook tem três cuidados**, e nenhum é opcional: token combinado (senão
+qualquer um libera a própria conta com um POST), idempotência por id de evento
+(gateways reenviam quando não recebem 200, e aplicar duas vezes empurraria o
+vencimento dois meses), e 200 rápido mesmo para evento que não interessa —
+erro nosso vira reenvio, e reenvio vira fila.
 
 ## Avisos
 

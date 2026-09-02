@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
+import { currentUser } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "NEXO — o app que se paga sozinho",
@@ -8,10 +9,13 @@ export const metadata: Metadata = {
     "Veja quanto esquecer um boleto, uma garantia ou uma consulta custou a você no último ano — e por que R$ 19,90 por mês sai mais barato.",
 };
 
-export default function OnboardingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function OnboardingPage() {
+  const user = await currentUser();
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 sm:py-12">
-      <OnboardingFlow />
+      <OnboardingFlow autenticado={Boolean(user)} />
     </main>
   );
 }

@@ -9,6 +9,7 @@ import type {
   PushSubscriptionRecord,
   Reminder,
   Store,
+  Subscription,
 } from "./types";
 
 /**
@@ -203,6 +204,36 @@ export const supabaseStore: Store = {
     return moved;
   },
 
+  async getSubscription(ownerId) {
+    const { data, error } = await client()
+      .from("subscriptions")
+      .select("*")
+      .eq("owner_id", ownerId)
+      .maybeSingle();
+    if (error) throw new Error(`Supabase: ${error.message}`);
+    return data ?? null;
+  },
+
+  async upsertSubscription(ownerId, patch) {
+    return unwrap<Subscription>(
+      await client()
+        .from("subscriptions")
+        .upsert({ owner_id: ownerId, updated_at: new Date().toISOString(), ...patch }, { onConflict: "owner_id" })
+        .select()
+        .single(),
+    );
+  },
+
+  async findSubscriptionBy(field, value) {
+    const { data, error } = await client()
+      .from("subscriptions")
+      .select("*")
+      .eq(field, value)
+      .maybeSingle();
+    if (error) throw new Error(`Supabase: ${error.message}`);
+    return data ?? null;
+  },
+
   async savePushSubscription(ownerId, draft) {
     // onConflict no endpoint: o mesmo aparelho reinscrito atualiza a linha em
     // vez de virar um segundo aviso para a mesma tela.
@@ -242,6 +273,7 @@ export const supabaseStore: Store = {
     // fica órfã caso alguma etapa falhe no meio.
     const apagadas: Record<string, number> = {};
     for (const [tabela, coluna] of [
+      ["subscriptions", "owner_id"],
       ["push_subscriptions", "owner_id"],
       ["notifications", "owner_id"],
       ["reminders", "owner_id"],

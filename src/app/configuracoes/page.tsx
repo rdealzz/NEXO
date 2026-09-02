@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { PainelAssinatura } from "@/components/assinatura/painel-assinatura";
 import { ExcluirConta } from "@/components/legal/excluir-conta";
 import { AtivarAvisos } from "@/components/permissoes/avisos";
 import { Botao } from "@/components/ui/button";
+import { acessoDe } from "@/lib/assinatura/acesso";
+import { asaasConfigurado } from "@/lib/assinatura/asaas";
 import { MarcaNexo } from "@/components/ui/logo";
 import { EscolhaTema } from "@/components/ui/tema";
 import { sendText, whatsappConfigured } from "@/lib/inbound/whatsapp";
@@ -57,6 +60,7 @@ export default async function ConfiguracoesPage({
   if (!user) redirect("/entrar");
 
   const profile = await ensureProfile(user.id, user.email);
+  const acesso = await acessoDe(user.id);
   const endereco = inboundAddress(profile);
 
   return (
@@ -77,6 +81,11 @@ export default async function ConfiguracoesPage({
       {vinculado && <p className="mt-4 text-sm text-accent">Telefone vinculado. Pode me mandar coisas por lá.</p>}
 
       <section className="mt-8 rounded-2xl border border-line bg-surface p-4">
+        <h2 className="text-sm font-semibold">Assinatura</h2>
+        <PainelAssinatura acesso={acesso} disponivel={asaasConfigurado()} />
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
         <h2 className="text-sm font-semibold">Avisos</h2>
         <p className="mt-1 text-sm text-muted">
           É por aqui que o NEXO cumpre a promessa: o aviso chega no aparelho mesmo com o app fechado.

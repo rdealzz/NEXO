@@ -109,6 +109,26 @@ export type PushSubscriptionRecord = {
 
 export type PushSubscriptionDraft = Omit<PushSubscriptionRecord, "id" | "owner_id" | "created_at">;
 
+export type StatusAssinatura = "pendente" | "ativa" | "atrasada" | "cancelada";
+
+/**
+ * A assinatura de uma pessoa, como o NEXO a enxerga.
+ *
+ * `valid_until` é o campo que decide o acesso, não `status`: quem cancela hoje
+ * continua usando até o fim do período que já pagou — é o que o contrato diz,
+ * e é o que evita cobrar por um serviço que foi cortado antes da hora.
+ */
+export type Subscription = {
+  owner_id: string;
+  customer_id: string | null;
+  subscription_id: string | null;
+  status: StatusAssinatura;
+  valid_until: string | null;
+  last_event_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export interface Store {
   readonly name: "memoria" | "supabase";
 
@@ -141,6 +161,15 @@ export interface Store {
 
   createPurchase(ownerId: string, captureId: string, purchase: Purchase): Promise<PurchaseRecord>;
   listPurchases(ownerId: string): Promise<PurchaseRecord[]>;
+
+  getSubscription(ownerId: string): Promise<Subscription | null>;
+  /** Cria ou atualiza; o webhook do gateway chama isto. */
+  upsertSubscription(
+    ownerId: string,
+    patch: Partial<Omit<Subscription, "owner_id" | "created_at">>,
+  ): Promise<Subscription>;
+  /** Resolve o dono a partir do id do gateway, que é o que o webhook manda. */
+  findSubscriptionBy(field: "customer_id" | "subscription_id", value: string): Promise<Subscription | null>;
 
   savePushSubscription(ownerId: string, draft: PushSubscriptionDraft): Promise<PushSubscriptionRecord>;
   listPushSubscriptions(ownerId: string): Promise<PushSubscriptionRecord[]>;

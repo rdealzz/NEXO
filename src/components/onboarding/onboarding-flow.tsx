@@ -37,7 +37,7 @@ const PASSOS = [
 
 const ETAPAS = ["Boas-vindas", "Como funciona", "A conta", "Plano"];
 
-export function OnboardingFlow() {
+export function OnboardingFlow({ autenticado = false }: { autenticado?: boolean }) {
   const [etapa, setEtapa] = useState(0);
   const [economia, setEconomia] = useState(() => totalPerdido(vezesPadrao()));
 
@@ -92,7 +92,7 @@ export function OnboardingFlow() {
             </div>
           </section>
         )}
-        {etapa === 3 && <Paywall economia={economia} />}
+        {etapa === 3 && <Paywall economia={economia} autenticado={autenticado} />}
       </div>
 
       <nav className="mt-8 flex items-center gap-3">

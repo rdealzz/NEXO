@@ -9,6 +9,7 @@ import type {
   Profile,
   PushSubscriptionRecord,
   PurchaseRecord,
+  Subscription,
   Reminder,
   ReminderDraft,
   Store,
@@ -27,6 +28,7 @@ type Tables = {
   purchases: PurchaseRecord[];
   profiles: Profile[];
   push: PushSubscriptionRecord[];
+  subscriptions: Subscription[];
 };
 
 const globalRef = globalThis as unknown as { __nexoMemory?: Tables };
@@ -37,6 +39,7 @@ const db: Tables = (globalRef.__nexoMemory ??= {
   purchases: [],
   profiles: [],
   push: [],
+  subscriptions: [],
 });
 
 /** Refaz os avisos ainda não enviados de um lembrete. */
@@ -162,6 +165,36 @@ export const memoryStore: Store = {
     return moved;
   },
 
+  async getSubscription(ownerId) {
+    return db.subscriptions.find((a) => a.owner_id === ownerId) ?? null;
+  },
+
+  async upsertSubscription(ownerId, patch) {
+    const agora = new Date().toISOString();
+    const existente = db.subscriptions.find((a) => a.owner_id === ownerId);
+    if (existente) {
+      Object.assign(existente, patch, { updated_at: agora });
+      return existente;
+    }
+    const nova: Subscription = {
+      owner_id: ownerId,
+      customer_id: null,
+      subscription_id: null,
+      status: "pendente",
+      valid_until: null,
+      last_event_id: null,
+      created_at: agora,
+      updated_at: agora,
+      ...patch,
+    };
+    db.subscriptions.push(nova);
+    return nova;
+  },
+
+  async findSubscriptionBy(field, value) {
+    return db.subscriptions.find((a) => a[field] === value) ?? null;
+  },
+
   async savePushSubscription(ownerId, draft) {
     // O endpoint é a identidade: reinscrever o mesmo aparelho substitui a linha.
     const anterior = db.push.findIndex((p) => p.endpoint === draft.endpoint);
@@ -195,6 +228,7 @@ export const memoryStore: Store = {
       apagadas[nome] = antes - tabela.length;
     };
 
+    remover(db.subscriptions, "subscriptions");
     remover(db.push, "push_subscriptions");
     remover(db.notifications, "notifications");
     remover(db.reminders, "reminders");

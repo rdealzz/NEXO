@@ -171,6 +171,6 @@ concluir e excluir; registro de compras e garantias; login por link mágico,
 Google ou senha, com migração do que foi criado antes da conta; entrada por
 e-mail e WhatsApp; PWA instalável.
 
-**Ainda não:** cobrança, e as
+**Ainda não:** as
 perguntas sobre o histórico de compras ("quais produtos ainda estão na
 garantia?") — o banco já guarda os dados para isso.
