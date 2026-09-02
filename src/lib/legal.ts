@@ -1,20 +1,12 @@
 /**
- * Identificação do controlador e datas dos documentos legais.
+ * Datas e contato dos documentos legais.
  *
- * Fica em variáveis de ambiente porque muda quando a empresa muda — razão
- * social, CNPJ e e-mail de contato precisam ser os reais antes de publicar nas
- * lojas. Sem eles, as páginas simplesmente omitem a linha em vez de inventar.
+ * Razão social, CNPJ e endereço ficaram de fora de propósito: enquanto a
+ * empresa não estiver constituída, é melhor a página não dizer nada do que
+ * dizer um dado inventado. O e-mail de contato é opcional pelo mesmo motivo —
+ * sem ele, o texto aponta o caminho que já funciona hoje, dentro do app.
  */
-export const CONTROLADOR = {
-  nome: process.env.NEXT_PUBLIC_EMPRESA_NOME ?? "NEXO",
-  cnpj: process.env.NEXT_PUBLIC_EMPRESA_CNPJ ?? null,
-  endereco: process.env.NEXT_PUBLIC_EMPRESA_ENDERECO ?? null,
-  contato: process.env.NEXT_PUBLIC_EMAIL_CONTATO ?? "privacidade@nexo.app",
-};
+export const EMAIL_CONTATO = process.env.NEXT_PUBLIC_EMAIL_CONTATO || null;
 
 /** Data da última revisão dos documentos. */
 export const ATUALIZADO_EM = "2 de setembro de 2026";
-
-export function dataPorExtenso(): string {
-  return ATUALIZADO_EM;
-}

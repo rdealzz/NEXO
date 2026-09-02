@@ -1,3 +1,5 @@
+import { store } from "./db";
+import { enviarPush, payloadDoLembrete, pushConfigurado } from "./push";
 import type { Reminder } from "./db";
 
 /**
@@ -33,11 +35,49 @@ export function notificationAssets() {
   };
 }
 
+/**
+ * Manda o aviso para todos os aparelhos que a pessoa autorizou.
+ *
+ * Uma pessoa costuma ter mais de um (celular e PC) e todos devem tocar. Sucesso
+ * em qualquer um já conta como entregue: falhar tudo por causa de um navegador
+ * que a pessoa desinstalou seria pior. Assinatura expirada é apagada na hora —
+ * senão o despachante fica batendo em endereço morto para sempre.
+ */
+async function entregarPorPush(reminder: Reminder, lead: number, texto: string): Promise<Delivery | null> {
+  if (!pushConfigurado()) return null;
+
+  const assinaturas = await store().listPushSubscriptions(reminder.owner_id);
+  if (assinaturas.length === 0) return null;
+
+  const payload = payloadDoLembrete(reminder, texto);
+  const resultados = await Promise.all(assinaturas.map((a) => enviarPush(a, payload)));
+
+  await Promise.all(
+    assinaturas
+      .filter((_, i) => resultados[i].expirada)
+      .map((a) => store().deletePushSubscription(a.endpoint)),
+  );
+
+  const entregues = resultados.filter((r) => r.ok).length;
+  return {
+    reminder_id: reminder.id,
+    lead,
+    channel: `push(${entregues}/${assinaturas.length})`,
+    ok: entregues > 0,
+    error: entregues > 0 ? undefined : resultados.find((r) => r.erro)?.erro,
+  };
+}
+
 export async function deliver(reminder: Reminder, lead: number): Promise<Delivery> {
   const url = process.env.NEXO_NOTIFY_WEBHOOK;
   const text = messageFor(reminder, lead);
 
+  // Push primeiro: é o canal que chega na tela de bloqueio, com o app fechado.
+  const porPush = await entregarPorPush(reminder, lead, text);
+  if (porPush?.ok) return porPush;
+
   if (!url) {
+    if (porPush) return porPush;
     console.log(`[nexo:aviso] ${reminder.owner_id} → ${text}`);
     return { reminder_id: reminder.id, lead, channel: "log", ok: true };
   }

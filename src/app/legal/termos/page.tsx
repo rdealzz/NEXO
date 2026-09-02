@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { ATUALIZADO_EM, CONTROLADOR } from "@/lib/legal";
+import { ATUALIZADO_EM, EMAIL_CONTATO } from "@/lib/legal";
 import { brl, PLANO } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -16,9 +16,17 @@ export default function TermosPage() {
       <p className="atualizado">Última atualização: {ATUALIZADO_EM}</p>
 
       <p>
-        Estes termos são o contrato entre você e {CONTROLADOR.nome} pelo uso do NEXO. Ao criar uma conta ou usar
-        o serviço, você concorda com eles. Estão escritos para serem entendidos — se algo aqui parecer ambíguo,
-        escreva para <a href={`mailto:${CONTROLADOR.contato}`}>{CONTROLADOR.contato}</a>.
+        Estas são as regras de uso do NEXO. Ao criar uma conta ou usar o serviço, você concorda com elas. Estão
+        escritas para serem entendidas — se algo aqui parecer ambíguo, fale com a gente
+        {EMAIL_CONTATO ? (
+          <>
+            {" "}
+            em <a href={`mailto:${EMAIL_CONTATO}`}>{EMAIL_CONTATO}</a>
+          </>
+        ) : (
+          " pelo canal de contato indicado no app"
+        )}
+        .
       </p>
 
       <h2>1. O que o NEXO é</h2>
@@ -75,7 +83,7 @@ export default function TermosPage() {
         </li>
         <li>
           <strong>Arrependimento:</strong> se você assinar e desistir em até 7 dias, devolvemos o valor integral
-          (art. 49 do Código de Defesa do Consumidor). Basta pedir pelo e-mail de contato.
+          (art. 49 do Código de Defesa do Consumidor). Basta pedir.
         </li>
         <li>
           Mudanças de preço são avisadas com pelo menos 30 dias de antecedência e só valem no ciclo seguinte —

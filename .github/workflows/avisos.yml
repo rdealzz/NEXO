@@ -1,16 +1,23 @@
 name: Despachar avisos do NEXO
 
-# O cron do Vercel no plano Hobby só aceita uma execução por dia, e um dia é
-# tempo demais para um produto que promete avisar "10 minutos antes". Então o
-# despachante de verdade roda aqui, de graça, a cada 10 minutos. O cron do
-# vercel.json fica como rede de segurança diária.
+# Rede de segurança, não o despachante principal.
+#
+# Quem roda a cada minuto é o pg_cron do Postgres (supabase/migrations/
+# 0005_cron_por_minuto.sql) — é o único agendador de graça que chega nessa
+# frequência, e "avisar 10 minutos antes" exige isso. O GitHub Actions não desce
+# de 5 minutos, e o cron da Vercel no plano Hobby aceita uma vez por dia; os
+# dois ficam aqui para o caso de o banco não estar com o pg_cron ligado.
+#
+# Nada se perde com a sobreposição: o despachante só lê avisos ainda não
+# enviados e marca cada um ao entregar, então rodar duas vezes no mesmo minuto
+# não manda o aviso duas vezes.
 #
 # Precisa de dois secrets no repositório:
 #   NEXO_URL     — https://seu-app.vercel.app
 #   CRON_SECRET  — o mesmo valor configurado nas variáveis do Vercel
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:

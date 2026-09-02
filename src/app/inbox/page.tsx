@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { InboxClient } from "@/components/inbox-client";
+import { AtivarAvisos } from "@/components/permissoes/avisos";
 import { MarcaNexo } from "@/components/ui/logo";
 import { AlternadorTema } from "@/components/ui/tema";
 import { store } from "@/lib/db";
@@ -57,6 +58,8 @@ export default async function InboxPage({
           para ver no celular e no PC.
         </p>
       )}
+
+      <AtivarAvisos chavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} compacto />
 
       <InboxClient initialReminders={reminders} />
     </main>

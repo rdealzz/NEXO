@@ -1,7 +1,15 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 import { plannedNotifications } from "./schedule";
-import type { DueNotification, Notification, Profile, PurchaseRecord, Reminder, Store } from "./types";
+import type {
+  DueNotification,
+  Notification,
+  Profile,
+  PurchaseRecord,
+  PushSubscriptionRecord,
+  Reminder,
+  Store,
+} from "./types";
 
 /**
  * Acesso pelo service role: as rotas do NEXO já resolvem o dono da requisição,
@@ -195,6 +203,29 @@ export const supabaseStore: Store = {
     return moved;
   },
 
+  async savePushSubscription(ownerId, draft) {
+    // onConflict no endpoint: o mesmo aparelho reinscrito atualiza a linha em
+    // vez de virar um segundo aviso para a mesma tela.
+    return unwrap<PushSubscriptionRecord>(
+      await client()
+        .from("push_subscriptions")
+        .upsert({ owner_id: ownerId, last_seen_at: new Date().toISOString(), ...draft }, { onConflict: "endpoint" })
+        .select()
+        .single(),
+    );
+  },
+
+  async listPushSubscriptions(ownerId) {
+    return unwrap<PushSubscriptionRecord[]>(
+      await client().from("push_subscriptions").select("*").eq("owner_id", ownerId),
+    );
+  },
+
+  async deletePushSubscription(endpoint) {
+    const { error } = await client().from("push_subscriptions").delete().eq("endpoint", endpoint);
+    if (error) throw new Error(`Supabase: ${error.message}`);
+  },
+
   async deleteOwner(ownerId) {
     // Os arquivos primeiro: se a linha da captura sumir antes, o caminho do
     // boleto no Storage vira lixo que ninguém mais sabe apagar.
@@ -211,6 +242,7 @@ export const supabaseStore: Store = {
     // fica órfã caso alguma etapa falhe no meio.
     const apagadas: Record<string, number> = {};
     for (const [tabela, coluna] of [
+      ["push_subscriptions", "owner_id"],
       ["notifications", "owner_id"],
       ["reminders", "owner_id"],
       ["purchases", "owner_id"],

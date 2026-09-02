@@ -10,7 +10,7 @@
  * Então o caminho aqui é sempre: toque → nossa tela explicando → a pessoa
  * aceita → só então a API nativa.
  */
-export type Permissao = "camera" | "galeria";
+export type Permissao = "camera" | "galeria" | "avisos";
 
 /** O que o navegador/sistema já respondeu sobre a permissão. */
 export type EstadoPermissao = "perguntar" | "concedida" | "negada" | "indisponivel";
@@ -40,6 +40,22 @@ export const TEXTOS: Record<Permissao, TextoPermissao> = {
       "No celular: Ajustes → o app NEXO → Câmera → Permitir.",
       "No navegador: toque no cadeado ao lado do endereço e libere a câmera.",
       "Depois volte aqui e toque em Câmera de novo.",
+    ],
+  },
+  avisos: {
+    titulo: "Avisar você na hora certa",
+    justificativa:
+      "Precisamos da permissão de notificações para avisar quando o boleto está para vencer, quando a garantia acaba e quando o compromisso chega — mesmo com o app fechado.",
+    detalhes: [
+      "Só mandamos o que você mesmo pediu para lembrar. Nada de novidades nem promoção.",
+      "Você escolhe a antecedência de cada aviso — de 10 minutos a 30 dias antes.",
+      "Dá para desligar a qualquer momento nas Configurações.",
+    ],
+    aceitar: "Entendi, quero ser avisado",
+    comoLiberar: [
+      "No celular: Ajustes → o app NEXO → Notificações → Permitir.",
+      "No navegador: toque no cadeado ao lado do endereço e libere as notificações.",
+      "Depois volte aqui e ligue os avisos de novo.",
     ],
   },
   galeria: {
@@ -94,6 +110,24 @@ export async function estadoDaCamera(): Promise<EstadoPermissao> {
   } catch {
     return "indisponivel";
   }
+}
+
+/** O que o navegador já decidiu sobre os avisos. */
+export function estadoDosAvisos(): EstadoPermissao {
+  if (typeof window === "undefined" || !("Notification" in window)) return "indisponivel";
+  if (Notification.permission === "granted") return "concedida";
+  if (Notification.permission === "denied") return "negada";
+  return "perguntar";
+}
+
+/** Push exige service worker e contexto seguro — não existe em http. */
+export function avisosDisponiveis(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    "Notification" in window &&
+    "serviceWorker" in navigator &&
+    "PushManager" in window
+  );
 }
 
 /** getUserMedia só existe em contexto seguro (https ou localhost). */

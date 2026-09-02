@@ -20,6 +20,7 @@ src/app/
   api/
     capture · reminders     ✅ Etapa 5 — extração e persistência
     cron/dispatch           ✅ Etapa 5 — despachante de avisos (custo zero de IA)
+    push/inscrever          ✅ Etapa 5 — registra o aparelho para receber avisos
     inbound/{email,whatsapp}✅ entrada de fora do app
     conta/excluir           ✅ Etapa 4 — exclusão permanente da conta
     assinatura/             ⬜ Etapa 6 — checkout e webhook do gateway
@@ -39,7 +40,8 @@ src/lib/
   db/                       ✅ store em memória (dev) e Supabase (produção)
   permissoes.ts             ✅ Etapa 3 — justificativas e estado das permissões
   legal.ts · cookies.ts     ✅ Etapa 4 — controlador e consentimento
-  notify.ts                 ✅ entrega do aviso, já com a cara da marca
+  notify.ts                 ✅ entrega do aviso: push primeiro, webhook depois
+  push.ts                   ✅ Etapa 5 — Web Push (VAPID) e limpeza de assinatura morta
   tema.ts                   ✅ Etapa 2 — preferência de tema e script anti-flash
   assinatura/               ⬜ Etapa 6 — cliente do gateway e estado do plano
 ```
@@ -59,6 +61,34 @@ notificação chega no celular — que era o ponto: o aviso tem cara de NEXO.
 
 Verde da marca `#146b4f`, luz `#7fecc0`, base creme `#fbf8f0`.
 
+## Avisos
+
+O aviso é o produto. Se ele não chega com o app fechado, nada do resto importa.
+
+**Web Push (VAPID)** é o caminho: funciona igual no Android, no desktop e no
+iOS a partir do 16.4 — lá, só com o app instalado na tela de início. O
+`public/sw.js` existe para isso e só para isso: nenhum cache de página, porque
+cache mal feito mostra lembrete velho, que é pior que não mostrar nada. A
+notificação traz "Feito" e "Depois", que resolvem o lembrete sem abrir o app.
+
+Uma pessoa tem mais de um aparelho, e todos devem tocar: o despachante manda
+para todas as assinaturas do dono e considera entregue se qualquer uma aceitar.
+O endpoint é a identidade da assinatura — reinscrever o mesmo aparelho atualiza
+a linha em vez de duplicar o aviso — e 404/410 do serviço de push apaga a linha
+na hora, senão o despachante bate em endereço morto para sempre.
+
+**A cada minuto.** "Aviso 10 minutos antes" só é verdade se alguém olhar os
+vencidos com frequência maior que a menor antecedência oferecida. Nenhum
+agendador de graça chega lá — a Vercel Hobby aceita 1×/dia, o GitHub Actions não
+desce de 5 minutos. Quem roda a cada minuto é o `pg_cron` do Postgres
+(`supabase/migrations/0005_cron_por_minuto.sql`), fazendo um POST na rota de
+despacho. Os outros dois ficam como rede de segurança, e a sobreposição é
+inofensiva: o despachante lê só o que ainda não saiu e marca ao entregar.
+
+**Custo zero de IA.** A rota de despacho não chama modelo nenhum — é leitura de
+índice parcial (`sent_at is null and notify_at <= now()`), aritmética de data e
+envio. `src/lib/nexo/despacho.test.ts` protege essa fronteira.
+
 ## LGPD e lojas
 
 **Exclusão de conta.** `deleteOwner` faz parte do contrato do `Store`, então as
@@ -73,10 +103,9 @@ do aparelho). O banner mesmo assim oferece a recusa, e a escolha fica em
 `podeMedir()` — a porta que qualquer medição futura terá de atravessar. Sem
 essa porta, o banner seria enfeite.
 
-**Identificação do controlador** vem de variáveis de ambiente
-(`NEXT_PUBLIC_EMPRESA_*`). Sem elas as páginas omitem a linha em vez de inventar
-razão social ou CNPJ — e é isso que precisa ser preenchido antes de submeter às
-lojas.
+**Identificação da empresa** ficou fora dos documentos por enquanto: enquanto
+não houver razão social e CNPJ reais, a página não diz nada em vez de dizer um
+dado inventado. Quando existirem, entram em `src/lib/legal.ts`.
 
 ## Permissões
 

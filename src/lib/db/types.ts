@@ -92,6 +92,23 @@ export type PurchaseRecord = Purchase & {
   created_at: string;
 };
 
+/**
+ * Um aparelho autorizado a receber avisos. O `endpoint` é a identidade da
+ * assinatura: reinscrever o mesmo aparelho atualiza a linha, nunca duplica o
+ * aviso. Uma pessoa costuma ter mais de um (celular e PC).
+ */
+export type PushSubscriptionRecord = {
+  id: string;
+  owner_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  user_agent: string | null;
+  created_at: string;
+};
+
+export type PushSubscriptionDraft = Omit<PushSubscriptionRecord, "id" | "owner_id" | "created_at">;
+
 export interface Store {
   readonly name: "memoria" | "supabase";
 
@@ -124,6 +141,11 @@ export interface Store {
 
   createPurchase(ownerId: string, captureId: string, purchase: Purchase): Promise<PurchaseRecord>;
   listPurchases(ownerId: string): Promise<PurchaseRecord[]>;
+
+  savePushSubscription(ownerId: string, draft: PushSubscriptionDraft): Promise<PushSubscriptionRecord>;
+  listPushSubscriptions(ownerId: string): Promise<PushSubscriptionRecord[]>;
+  /** Chamado quando o serviço de push responde 404/410: o aparelho sumiu. */
+  deletePushSubscription(endpoint: string): Promise<void>;
 
   getProfile(userId: string): Promise<Profile | null>;
   upsertProfile(profile: Omit<Profile, "created_at">): Promise<Profile>;

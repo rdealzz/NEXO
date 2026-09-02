@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { ATUALIZADO_EM, CONTROLADOR } from "@/lib/legal";
+import { ATUALIZADO_EM, EMAIL_CONTATO } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade — NEXO",
@@ -29,16 +29,6 @@ export default function PrivacidadePage() {
           modelos, nossos ou de terceiros. Também não vendemos, alugamos nem cedemos seus dados para publicidade.
         </p>
       </div>
-
-      <h2>Quem é o controlador</h2>
-      <p>
-        {CONTROLADOR.nome}
-        {CONTROLADOR.cnpj ? `, inscrita no CNPJ ${CONTROLADOR.cnpj}` : ""}
-        {CONTROLADOR.endereco ? `, com endereço em ${CONTROLADOR.endereco}` : ""}, é a controladora dos dados
-        tratados no NEXO, nos termos da Lei Geral de Proteção de Dados (Lei 13.709/2018). Para qualquer assunto
-        desta política, incluindo o exercício dos seus direitos, escreva para{" "}
-        <a href={`mailto:${CONTROLADOR.contato}`}>{CONTROLADOR.contato}</a>.
-      </p>
 
       <h2>O que coletamos</h2>
       <ul>
@@ -119,8 +109,16 @@ export default function PrivacidadePage() {
       </p>
       <p>
         A eliminação você mesmo executa: <Link href="/configuracoes">Configurações → Excluir conta</Link>. É
-        imediato e definitivo. Para os demais direitos, escreva para{" "}
-        <a href={`mailto:${CONTROLADOR.contato}`}>{CONTROLADOR.contato}</a> — respondemos em até 15 dias.
+        imediato e definitivo, e cobre tudo — capturas, lembretes, arquivos, compras e o login.
+        {EMAIL_CONTATO ? (
+          <>
+            {" "}
+            Para os demais direitos, escreva para <a href={`mailto:${EMAIL_CONTATO}`}>{EMAIL_CONTATO}</a> —
+            respondemos em até 15 dias.
+          </>
+        ) : (
+          " Para os demais direitos, use o canal de contato indicado no app."
+        )}
       </p>
 
       <h2>Menores de idade</h2>

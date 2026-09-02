@@ -82,16 +82,25 @@ boletos ficam num bucket privado — nunca público.
 
 ### Avisos
 
-`/api/cron/dispatch` varre os avisos vencidos e entrega. Sem
-`NEXO_NOTIFY_WEBHOOK`, escreve no log; com webhook, faz um `POST` JSON por aviso
-— é aí que entram WhatsApp, Telegram, push ou e-mail.
+`/api/cron/dispatch` varre os avisos vencidos e entrega. O canal principal é
+**push** (Web Push com chaves VAPID): chega na tela de bloqueio com o app
+fechado, com os botões "Feito" e "Depois". Sem as chaves, ou sem nenhum aparelho
+registrado, cai no `NEXO_NOTIFY_WEBHOOK` — um `POST` JSON por aviso, que é onde
+entram WhatsApp, Telegram ou e-mail. Sem nenhum dos dois, escreve no log.
+
+Gere o par de chaves uma vez com `npm run chaves:push`.
 
 Quem chama essa rota depende do plano:
 
 | Onde | Frequência | Observação |
 | --- | --- | --- |
-| `.github/workflows/avisos.yml` | a cada 10 min | É o despachante de verdade. Precisa dos secrets `NEXO_URL` e `CRON_SECRET` no repositório. Funciona em qualquer plano. |
-| `vercel.json` | 1×/dia | Rede de segurança. **O plano Hobby da Vercel só aceita cron diário — um cron mais frequente aqui faz o deploy falhar.** No Pro, troque por `*/10 * * * *` e apague o workflow. |
+| `supabase/migrations/0005_cron_por_minuto.sql` | a cada minuto | É o despachante de verdade. `pg_cron` é o único agendador de graça que chega nessa frequência — e "aviso 10 minutos antes" exige isso. Aplique uma vez, trocando os dois placeholders. |
+| `.github/workflows/avisos.yml` | a cada 5 min | Rede de segurança. Precisa dos secrets `NEXO_URL` e `CRON_SECRET` no repositório. |
+| `vercel.json` | 1×/dia | Última rede. **O plano Hobby da Vercel só aceita cron diário — um cron mais frequente aqui faz o deploy falhar.** |
+
+A sobreposição é inofensiva: o despachante lê só o que ainda não saiu e marca
+cada aviso ao entregar, então dois agendadores no mesmo minuto não mandam o
+aviso duas vezes.
 
 A Vercel manda `Authorization: Bearer $CRON_SECRET` sozinha; o workflow manda o
 mesmo header.
@@ -162,6 +171,6 @@ concluir e excluir; registro de compras e garantias; login por link mágico,
 Google ou senha, com migração do que foi criado antes da conta; entrada por
 e-mail e WhatsApp; PWA instalável.
 
-**Ainda não:** push nativo (o despacho sai por webhook), cobrança, e as
+**Ainda não:** cobrança, e as
 perguntas sobre o histórico de compras ("quais produtos ainda estão na
 garantia?") — o banco já guarda os dados para isso.

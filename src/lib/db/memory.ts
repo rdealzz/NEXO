@@ -7,6 +7,7 @@ import type {
   DueNotification,
   Notification,
   Profile,
+  PushSubscriptionRecord,
   PurchaseRecord,
   Reminder,
   ReminderDraft,
@@ -25,6 +26,7 @@ type Tables = {
   notifications: Notification[];
   purchases: PurchaseRecord[];
   profiles: Profile[];
+  push: PushSubscriptionRecord[];
 };
 
 const globalRef = globalThis as unknown as { __nexoMemory?: Tables };
@@ -34,6 +36,7 @@ const db: Tables = (globalRef.__nexoMemory ??= {
   notifications: [],
   purchases: [],
   profiles: [],
+  push: [],
 });
 
 /** Refaz os avisos ainda não enviados de um lembrete. */
@@ -159,6 +162,29 @@ export const memoryStore: Store = {
     return moved;
   },
 
+  async savePushSubscription(ownerId, draft) {
+    // O endpoint é a identidade: reinscrever o mesmo aparelho substitui a linha.
+    const anterior = db.push.findIndex((p) => p.endpoint === draft.endpoint);
+    if (anterior >= 0) db.push.splice(anterior, 1);
+    const linha: PushSubscriptionRecord = {
+      id: randomUUID(),
+      owner_id: ownerId,
+      created_at: new Date().toISOString(),
+      ...draft,
+    };
+    db.push.push(linha);
+    return linha;
+  },
+
+  async listPushSubscriptions(ownerId) {
+    return db.push.filter((p) => p.owner_id === ownerId);
+  },
+
+  async deletePushSubscription(endpoint) {
+    const indice = db.push.findIndex((p) => p.endpoint === endpoint);
+    if (indice >= 0) db.push.splice(indice, 1);
+  },
+
   async deleteOwner(ownerId) {
     const apagadas: Record<string, number> = {};
     const remover = <T extends { owner_id?: string; user_id?: string }>(tabela: T[], nome: string) => {
@@ -169,6 +195,7 @@ export const memoryStore: Store = {
       apagadas[nome] = antes - tabela.length;
     };
 
+    remover(db.push, "push_subscriptions");
     remover(db.notifications, "notifications");
     remover(db.reminders, "reminders");
     remover(db.purchases, "purchases");

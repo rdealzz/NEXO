@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { ExcluirConta } from "@/components/legal/excluir-conta";
+import { AtivarAvisos } from "@/components/permissoes/avisos";
 import { Botao } from "@/components/ui/button";
 import { MarcaNexo } from "@/components/ui/logo";
 import { EscolhaTema } from "@/components/ui/tema";
@@ -76,6 +77,14 @@ export default async function ConfiguracoesPage({
       {vinculado && <p className="mt-4 text-sm text-accent">Telefone vinculado. Pode me mandar coisas por lá.</p>}
 
       <section className="mt-8 rounded-2xl border border-line bg-surface p-4">
+        <h2 className="text-sm font-semibold">Avisos</h2>
+        <p className="mt-1 text-sm text-muted">
+          É por aqui que o NEXO cumpre a promessa: o aviso chega no aparelho mesmo com o app fechado.
+        </p>
+        <AtivarAvisos chavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
         <h2 className="text-sm font-semibold">Aparência</h2>
         <p className="mt-1 text-sm text-muted">
           O NEXO abre no claro. O escuro fica valendo em todo acesso, neste aparelho.
