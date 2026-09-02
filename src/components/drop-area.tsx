@@ -37,7 +37,9 @@ export function DropArea({ busy, onCapture }: Props) {
   // O pedido de permissão em curso: qual, e se é para explicar ou para ensinar
   // o caminho de volta depois de o sistema ter negado.
   const [pedido, setPedido] = useState<{ permissao: Permissao; modo: "explicar" | "bloqueada" } | null>(null);
-  const [cameraAberta, setCameraAberta] = useState(false);
+  // Guardamos se o navegador já havia concedido: é o que decide se a câmera
+  // liga sozinha ou espera o toque em "Permitir".
+  const [cameraAberta, setCameraAberta] = useState<{ jaConcedida: boolean } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const galeriaInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
@@ -65,19 +67,19 @@ export function DropArea({ busy, onCapture }: Props) {
    */
   const fotografou = useCallback(
     (arquivo: File) => {
-      setCameraAberta(false);
+      setCameraAberta(null);
       onCapture({ kind: "imagem", file: arquivo });
     },
     [onCapture],
   );
 
   /** Abre a câmera de verdade — só é chamado depois do aceite. */
-  const abrirCamera = useCallback(() => {
+  const abrirCamera = useCallback((jaConcedida: boolean) => {
     marcarExplicada("camera");
     setPedido(null);
     // Sem getUserMedia (navegador antigo, ou http), o app de câmera do sistema
     // ainda resolve: o <input capture> abre ele.
-    if (cameraDisponivel()) setCameraAberta(true);
+    if (cameraDisponivel()) setCameraAberta({ jaConcedida });
     else cameraInput.current?.click();
   }, []);
 
@@ -98,7 +100,7 @@ export function DropArea({ busy, onCapture }: Props) {
       return;
     }
     if (estado === "concedida" && jaExplicada("camera")) {
-      abrirCamera();
+      abrirCamera(true);
       return;
     }
     setPedido({ permissao: "camera", modo: "explicar" });
@@ -263,17 +265,18 @@ export function DropArea({ busy, onCapture }: Props) {
           key={`${pedido.permissao}-${pedido.modo}`}
           permissao={pedido.permissao}
           modo={pedido.modo}
-          onAceitar={pedido.permissao === "camera" ? abrirCamera : abrirGaleria}
+          onAceitar={pedido.permissao === "camera" ? () => abrirCamera(false) : abrirGaleria}
           onFechar={() => setPedido(null)}
         />
       )}
 
       {cameraAberta && (
         <Camera
+          jaConcedida={cameraAberta.jaConcedida}
           onFoto={fotografou}
-          onFechar={() => setCameraAberta(false)}
+          onFechar={() => setCameraAberta(null)}
           onNegada={() => {
-            setCameraAberta(false);
+            setCameraAberta(null);
             setPedido({ permissao: "camera", modo: "bloqueada" });
           }}
         />

@@ -115,6 +115,13 @@ export interface Store {
   /** Passa o que foi criado anonimamente para a conta recém-autenticada. */
   transferOwnership(from: string, to: string): Promise<number>;
 
+  /**
+   * Apaga tudo que é de um dono: capturas, lembretes, avisos, compras, perfil e
+   * os arquivos originais. É definitivo — não é arquivar, não é marcar como
+   * inativo. Devolve quantas linhas saíram, para o app poder dizer o que fez.
+   */
+  deleteOwner(ownerId: string): Promise<{ apagadas: Record<string, number>; arquivos: number }>;
+
   createPurchase(ownerId: string, captureId: string, purchase: Purchase): Promise<PurchaseRecord>;
   listPurchases(ownerId: string): Promise<PurchaseRecord[]>;
 

@@ -159,6 +159,24 @@ export const memoryStore: Store = {
     return moved;
   },
 
+  async deleteOwner(ownerId) {
+    const apagadas: Record<string, number> = {};
+    const remover = <T extends { owner_id?: string; user_id?: string }>(tabela: T[], nome: string) => {
+      const antes = tabela.length;
+      const restantes = tabela.filter((linha) => (linha.owner_id ?? linha.user_id) !== ownerId);
+      tabela.length = 0;
+      tabela.push(...restantes);
+      apagadas[nome] = antes - tabela.length;
+    };
+
+    remover(db.notifications, "notifications");
+    remover(db.reminders, "reminders");
+    remover(db.purchases, "purchases");
+    remover(db.captures, "captures");
+    remover(db.profiles, "profiles");
+    return { apagadas, arquivos: 0 };
+  },
+
   async getProfile(userId) {
     return db.profiles.find((p) => p.user_id === userId) ?? null;
   },

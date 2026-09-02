@@ -25,8 +25,12 @@
  * <html>, e quem põe ele lá é o script de src/lib/tema.ts, lendo o que a pessoa
  * escolheu. Sem escolha salva, o app abre claro — inclusive para quem usa o
  * sistema no escuro.
+ *
+ * O seletor não é preso ao <html> de propósito: uma área que é escura em
+ * qualquer tema — a tela da câmera, por exemplo — se declara com o mesmo
+ * atributo e herda a paleta inteira.
  */
-:root[data-tema="escuro"] {
+[data-tema="escuro"] {
   --background: #0d0e0c;
   --surface: #161815;
   --border: #262a25;
@@ -63,6 +67,53 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Texto legal: medida curta e linha alta, para ser lido de verdade. */
+.prose-nexo h1 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.prose-nexo h2 {
+  margin-top: 2rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.prose-nexo p,
+.prose-nexo li {
+  margin-top: 0.75rem;
+  line-height: 1.7;
+}
+
+.prose-nexo ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.prose-nexo strong {
+  font-weight: 600;
+}
+
+.prose-nexo a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-nexo .destaque {
+  margin-top: 1.25rem;
+  border-radius: 1rem;
+  background: var(--accent-soft);
+  padding: 1rem 1.25rem;
+}
+
+.prose-nexo .atualizado {
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
 /* ---------------------------------------------------------------------------

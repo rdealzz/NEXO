@@ -195,6 +195,39 @@ export const supabaseStore: Store = {
     return moved;
   },
 
+  async deleteOwner(ownerId) {
+    // Os arquivos primeiro: se a linha da captura sumir antes, o caminho do
+    // boleto no Storage vira lixo que ninguém mais sabe apagar.
+    let arquivos = 0;
+    const { data: guardados } = await client().storage.from(CAPTURE_BUCKET).list(ownerId, { limit: 1000 });
+    if (guardados?.length) {
+      const caminhos = guardados.map((arquivo) => `${ownerId}/${arquivo.name}`);
+      const { error } = await client().storage.from(CAPTURE_BUCKET).remove(caminhos);
+      if (error) throw new Error(`Supabase: ${error.message}`);
+      arquivos = caminhos.length;
+    }
+
+    // Do galho para a raiz: aviso → lembrete → captura. Assim nenhuma linha
+    // fica órfã caso alguma etapa falhe no meio.
+    const apagadas: Record<string, number> = {};
+    for (const [tabela, coluna] of [
+      ["notifications", "owner_id"],
+      ["reminders", "owner_id"],
+      ["purchases", "owner_id"],
+      ["captures", "owner_id"],
+      ["profiles", "user_id"],
+    ] as const) {
+      const { error, count } = await client()
+        .from(tabela)
+        .delete({ count: "exact" })
+        .eq(coluna, ownerId);
+      if (error) throw new Error(`Supabase: ${error.message}`);
+      apagadas[tabela] = count ?? 0;
+    }
+
+    return { apagadas, arquivos };
+  },
+
   async getProfile(userId) {
     const { data, error } = await client()
       .from("profiles")
