@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 /**
  * Botões 3D do NEXO.
  *
- * O relevo mora em `.btn3d` (src/app/globals.css) — aqui é só a montagem das
+ * O relevo mora em `.btn` (src/app/globals.css) — aqui é só a montagem das
  * classes, para que um `<button>`, um `<Link>` e um `<a>` fiquem idênticos.
  */
 export type ButtonVariant = "primary" | "surface" | "soft" | "danger" | "ghost";
@@ -18,15 +18,15 @@ type Look = {
 };
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
-  lg: "btn3d--lg",
+  lg: "btn--lg",
   md: "",
-  sm: "btn3d--sm",
-  chip: "btn3d--chip",
-  icon: "btn3d--icon",
+  sm: "btn--sm",
+  chip: "btn--chip",
+  icon: "btn--icon",
 };
 
 export function botaoClasses({ variant = "surface", size = "md", block, className }: Look = {}): string {
-  return ["btn3d", `btn3d--${variant}`, SIZE_CLASS[size], block ? "btn3d--block" : "", className ?? ""]
+  return ["btn", `btn--${variant}`, SIZE_CLASS[size], block ? "btn--block" : "", className ?? ""]
     .filter(Boolean)
     .join(" ");
 }

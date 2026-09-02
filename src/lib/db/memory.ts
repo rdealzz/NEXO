@@ -182,6 +182,8 @@ export const memoryStore: Store = {
       subscription_id: null,
       status: "pendente",
       valid_until: null,
+      card_brand: null,
+      card_last4: null,
       last_event_id: null,
       created_at: agora,
       updated_at: agora,

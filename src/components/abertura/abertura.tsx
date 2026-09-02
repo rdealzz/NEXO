@@ -48,15 +48,18 @@ export function Abertura() {
         saindo ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
-      <HelixChronoMatrix headline="" className="[&_header]:hidden" />
+      {/* Invertida junto com o herói: preta no tema claro, branca no escuro. */}
+      <div className="malha-contraste absolute inset-0">
+        <HelixChronoMatrix headline="" className="[&_header]:hidden" />
+      </div>
 
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-4">
         <MarcaNexo
           simbolo="size-16 sm:size-20"
           wordmark="h-7 sm:h-9"
-          className="gap-4 text-neutral-900 dark:text-white"
+          className="gap-4 text-white dark:text-neutral-900"
         />
-        <p className="font-medium text-neutral-600 dark:text-neutral-300">Joga aqui. Eu lembro.</p>
+        <p className="font-medium text-neutral-300 dark:text-neutral-600">Joga aqui. Eu lembro.</p>
       </div>
     </div>
   );

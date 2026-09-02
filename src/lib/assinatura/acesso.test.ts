@@ -15,6 +15,8 @@ function assinatura(patch: Partial<Subscription>): Subscription {
     subscription_id: "sub_1",
     status: "ativa",
     valid_until: null,
+    card_brand: null,
+    card_last4: null,
     last_event_id: null,
     created_at: "2026-01-01T00:00:00.000Z",
     updated_at: "2026-01-01T00:00:00.000Z",

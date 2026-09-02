@@ -123,7 +123,7 @@ function Item({
                   {opcao.label}
                 </Chip>
               ))}
-              <label className="btn3d btn3d--surface btn3d--chip cursor-pointer">
+              <label className="btn btn--surface btn--chip cursor-pointer">
                 escolher
                 <input
                   type="date"

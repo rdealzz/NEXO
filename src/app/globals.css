@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/*
+ * O `dark:` do Tailwind vem preso ao sistema operacional por padrão. Aqui ele
+ * passa a seguir o tema do app: quem escolheu claro vê claro mesmo com o
+ * celular no escuro, e as classes `dark:` acompanham essa escolha.
+ */
+@custom-variant dark (&:where([data-tema="escuro"], [data-tema="escuro"] *));
+
 :root {
   --background: #f7f7f5;
   --surface: #ffffff;
@@ -16,6 +23,8 @@
   --btn-shade: rgb(0 0 0 / 0.1);
   --btn-cast: rgb(22 21 15 / 0.2);
   --btn-primary-ink: #ffffff;
+  /* O cinza de preenchimento do iOS: quase neutro, quase transparente. */
+  --fill-suave: rgb(120 120 128 / 0.14);
 
   /* Tokens que os componentes do shadcn/ui esperam, apontados para a paleta do
      NEXO. Sem eles o Calendar renderiza sem cor nenhuma. */
@@ -61,6 +70,7 @@
   --btn-shade: rgb(0 0 0 / 0.35);
   --btn-cast: rgb(0 0 0 / 0.55);
   --btn-primary-ink: #06231a;
+  --fill-suave: rgb(120 120 128 / 0.26);
 
   --primary: var(--accent);
   --primary-foreground: var(--btn-primary-ink);
@@ -161,20 +171,18 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   Botões 3D
+   Botões
    ---------------------------------------------------------------------------
-   Um botão é uma peça física: face iluminada por cima, espessura sólida embaixo
-   (--btn-depth) e sombra projetada no fundo. Passar o mouse levanta a peça;
-   clicar afunda ela até a base e a sombra some junto — é o afundar que faz o
-   clique parecer real.
+   Padrão Apple: retângulo de cantos generosos, preenchimento sólido, sem borda
+   nem relevo. O toque não empurra uma peça para baixo — ele encolhe o botão de
+   leve e clareia, que é a resposta que o iOS dá. Todo o peso visual vem da cor,
+   não de sombra.
 
-   Uso: className="btn3d btn3d--primary" (ver src/components/ui/button.tsx).
+   Uso: className="btn btn--primary" (ver src/components/ui/button.tsx).
 --------------------------------------------------------------------------- */
-.btn3d {
-  --btn-face: var(--surface);
+.btn {
+  --btn-face: var(--fill-suave);
   --btn-ink: var(--foreground);
-  --btn-depth: 4px;
-  --btn-edge: color-mix(in oklab, var(--btn-face) 72%, #000);
 
   position: relative;
   display: inline-flex;
@@ -182,149 +190,183 @@ body {
   justify-content: center;
   gap: 0.5rem;
   border: 0;
-  border-radius: 9999px;
-  padding: 0.7rem 1.3rem;
+  border-radius: 0.75rem;
+  padding: 0.68rem 1.15rem;
   font: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.15;
+  font-size: 0.9375rem;
+  font-weight: 590;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--btn-ink);
+  background-color: var(--btn-face);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--btn-face) 90%, #fff) 0%,
-    var(--btn-face) 55%,
-    color-mix(in oklab, var(--btn-face) 94%, #000) 100%
-  );
-  box-shadow:
-    inset 0 1px 0 var(--btn-gloss),
-    inset 0 -1px 0 var(--btn-shade),
-    0 var(--btn-depth) 0 var(--btn-edge),
-    0 calc(var(--btn-depth) + 3px) 10px -3px var(--btn-cast);
-  transform: translateY(0);
   transition:
-    transform 120ms cubic-bezier(0.2, 0.8, 0.3, 1),
-    box-shadow 120ms cubic-bezier(0.2, 0.8, 0.3, 1),
-    filter 120ms ease;
+    transform 140ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 140ms ease,
+    background-color 140ms ease;
 }
 
-.btn3d:hover:not(:disabled):not([aria-disabled="true"]) {
-  transform: translateY(-1px);
-  filter: brightness(1.04);
-  box-shadow:
-    inset 0 1px 0 var(--btn-gloss),
-    inset 0 -1px 0 var(--btn-shade),
-    0 calc(var(--btn-depth) + 1px) 0 var(--btn-edge),
-    0 calc(var(--btn-depth) + 6px) 14px -3px var(--btn-cast);
+.btn:hover:not(:disabled):not([aria-disabled="true"]) {
+  opacity: 0.88;
 }
 
-/* Afunda até a base: a espessura vira 1px e a sombra projetada quase some. */
-.btn3d:active:not(:disabled):not([aria-disabled="true"]) {
-  transform: translateY(calc(var(--btn-depth) - 1px));
-  filter: brightness(0.98);
-  box-shadow:
-    inset 0 1px 2px var(--btn-shade),
-    0 1px 0 var(--btn-edge),
-    0 1px 2px -1px var(--btn-cast);
+/* O toque afunda pelo tamanho, não pela sombra. */
+.btn:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: scale(0.96);
+  opacity: 0.8;
 }
 
-.btn3d:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+.btn:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  outline-offset: 2px;
 }
 
-.btn3d:disabled,
-.btn3d[aria-disabled="true"] {
+.btn:disabled,
+.btn[aria-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.45;
+  opacity: 0.35;
   transform: none;
-  filter: none;
-  box-shadow:
-    inset 0 1px 0 var(--btn-gloss),
-    0 2px 0 var(--btn-edge);
 }
 
-/* Interruptor ligado: fica afundado enquanto estiver ativo. */
-.btn3d[aria-pressed="true"],
-.btn3d[data-ativo="true"] {
-  transform: translateY(calc(var(--btn-depth) - 1px));
-  box-shadow:
-    inset 0 2px 4px var(--btn-shade),
-    0 1px 0 var(--btn-edge);
+/* Interruptor ligado. */
+.btn[aria-pressed="true"],
+.btn[data-ativo="true"] {
+  --btn-face: var(--accent);
+  --btn-ink: var(--btn-primary-ink);
 }
 
 /* --- Variantes ---------------------------------------------------------- */
-.btn3d--primary {
+.btn--primary {
   --btn-face: var(--accent);
   --btn-ink: var(--btn-primary-ink);
-  --btn-edge: color-mix(in oklab, var(--accent) 62%, #000);
 }
 
-.btn3d--surface {
-  --btn-face: var(--surface);
+.btn--surface {
+  --btn-face: var(--fill-suave);
   --btn-ink: var(--foreground);
-  --btn-edge: color-mix(in oklab, var(--border) 82%, #000);
 }
 
-.btn3d--soft {
+.btn--soft {
   --btn-face: var(--accent-soft);
   --btn-ink: var(--accent);
-  --btn-edge: color-mix(in oklab, var(--accent-soft) 70%, #000);
 }
 
-.btn3d--danger {
+.btn--danger {
   --btn-face: var(--danger);
   --btn-ink: #ffffff;
-  --btn-edge: color-mix(in oklab, var(--danger) 62%, #000);
 }
 
-.btn3d--ghost {
-  --btn-face: color-mix(in oklab, var(--surface) 55%, transparent);
-  --btn-ink: var(--muted);
-  --btn-depth: 2px;
-  --btn-edge: color-mix(in oklab, var(--border) 88%, #000);
-}
-
-.btn3d--ghost:hover:not(:disabled) {
-  --btn-ink: var(--foreground);
-}
-
-/* --- Tamanhos ----------------------------------------------------------- */
-.btn3d--lg {
-  --btn-depth: 5px;
-  padding: 0.95rem 1.75rem;
-  font-size: 1rem;
-}
-
-.btn3d--sm {
-  --btn-depth: 3px;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.8125rem;
-}
-
-.btn3d--chip {
-  --btn-depth: 2px;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.75rem;
+/* Botão de texto do iOS: sem fundo, a cor faz o trabalho. */
+.btn--ghost {
+  --btn-face: transparent;
+  --btn-ink: var(--accent);
   font-weight: 500;
 }
 
-.btn3d--icon {
-  --btn-depth: 3px;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  border-radius: 9999px;
+.btn--ghost:hover:not(:disabled) {
+  --btn-face: var(--fill-suave);
+  opacity: 1;
 }
 
-.btn3d--block {
+/* --- Tamanhos ----------------------------------------------------------- */
+.btn--lg {
+  border-radius: 0.875rem;
+  padding: 0.95rem 1.6rem;
+  font-size: 1.0625rem;
+}
+
+.btn--sm {
+  border-radius: 0.625rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.875rem;
+}
+
+.btn--chip {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.btn--icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.btn--block {
   display: flex;
   width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* O marcador redondo de "concluir" acompanha o mesmo toque. */
+.dot3d {
+  border-radius: 9999px;
+  background: var(--surface);
+  transition: transform 140ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dot3d:active {
+  transform: scale(0.9);
+}
+
+/* ---------------------------------------------------------------------------
+   A malha de contraste
+   ---------------------------------------------------------------------------
+   O bloco fica preto quando o site está no claro, e branco quando está no
+   escuro — o contrário do resto da página, de propósito.
+
+   O componente que desenha a malha decide a própria cor lendo o sistema
+   operacional, e não dá para mudar isso sem editá-lo. Então o filtro só entra
+   nas combinações em que ele erraria o lado: quando o sistema concorda com o
+   tema do app, invertemos; quando discorda, ele já pinta o lado certo sozinho.
+--------------------------------------------------------------------------- */
+.malha-contraste {
+  /* Sistema claro e app claro: o componente pinta claro, então invertemos. */
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .malha-contraste {
+    /* Sistema escuro força o componente a pintar escuro; já está preto. */
+    filter: none;
+  }
+}
+
+:root[data-tema="escuro"] .malha-contraste {
+  /* No tema escuro o app marca a classe `dark`, então o componente pinta
+     escuro em qualquer sistema — e aí o filtro é sempre necessário. */
+  filter: invert(1);
+}
+
+/*
+ * Controles em cima do bloco de contraste. Como o bloco é sempre o oposto da
+ * página, o cinza de preenchimento e a cor do texto também precisam inverter —
+ * senão o botão secundário some no preto.
+ */
+.sobre-contraste .btn--surface {
+  --btn-face: rgb(255 255 255 / 0.16);
+  --btn-ink: #ffffff;
+}
+
+:root[data-tema="escuro"] .sobre-contraste .btn--surface {
+  --btn-face: rgb(0 0 0 / 0.08);
+  --btn-ink: #16150f;
 }
 
 /* Dia que tem lembrete: um ponto embaixo do número. */
@@ -344,34 +386,12 @@ body {
   background: var(--primary-foreground);
 }
 
-/* Marcador redondo de "concluir": mesma física, sem face colorida. */
-.dot3d {
-  border-radius: 9999px;
-  background-image: linear-gradient(180deg, var(--surface), color-mix(in oklab, var(--surface) 92%, #000));
-  box-shadow:
-    inset 0 1px 0 var(--btn-gloss),
-    0 2px 0 color-mix(in oklab, var(--border) 80%, #000),
-    0 3px 5px -2px var(--btn-cast);
-  transition:
-    transform 120ms cubic-bezier(0.2, 0.8, 0.3, 1),
-    box-shadow 120ms cubic-bezier(0.2, 0.8, 0.3, 1);
-}
-
-.dot3d:hover {
-  transform: translateY(-1px);
-}
-
-.dot3d:active {
-  transform: translateY(2px);
-  box-shadow: inset 0 1px 3px var(--btn-shade);
-}
-
 /* Quem pediu menos movimento continua vendo o relevo, mas sem o salto. */
 @media (prefers-reduced-motion: reduce) {
-  .btn3d {
+  .btn {
     transition: none;
   }
-  .btn3d:hover:not(:disabled),
+  .btn:hover:not(:disabled),
   .dot3d:hover {
     transform: none;
   }

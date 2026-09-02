@@ -24,12 +24,35 @@ export async function ensureProfile(userId: string, email: string | null): Promi
   return store().upsertProfile({
     user_id: userId,
     email,
+    display_name: null,
+    avatar_id: null,
+    billing_cep: null,
+    billing_logradouro: null,
+    billing_numero: null,
+    billing_complemento: null,
+    billing_bairro: null,
+    billing_cidade: null,
+    billing_uf: null,
     phone: null,
     phone_pending: null,
     phone_code: null,
     phone_code_expires_at: null,
     inbox_slug: slugFrom(email),
   });
+}
+
+/** O nome que o app usa para falar com a pessoa. */
+export function nomeDe(profile: Pick<Profile, "display_name" | "email">): string {
+  const escolhido = profile.display_name?.trim();
+  if (escolhido) return escolhido;
+  const doEmail = profile.email?.split("@")[0]?.replace(/[._-]+/g, " ").trim();
+  if (!doEmail) return "você";
+  return doEmail.charAt(0).toUpperCase() + doEmail.slice(1);
+}
+
+/** Só o primeiro nome — é o que cabe no cabeçalho. */
+export function primeiroNome(profile: Pick<Profile, "display_name" | "email">): string {
+  return nomeDe(profile).split(" ")[0];
 }
 
 export function inboundAddress(profile: Profile): string | null {

@@ -72,6 +72,18 @@ export type DueNotification = { notification: Notification; reminder: Reminder }
 export type Profile = {
   user_id: string;
   email: string | null;
+  /** Como a pessoa quer ser chamada. Vazio = usamos o começo do e-mail. */
+  display_name: string | null;
+  /** Id do avatar escolhido (ver src/lib/avatares.ts). */
+  avatar_id: string | null;
+  /** Endereço de cobrança: o gateway exige para boleto e Pix. */
+  billing_cep: string | null;
+  billing_logradouro: string | null;
+  billing_numero: string | null;
+  billing_complemento: string | null;
+  billing_bairro: string | null;
+  billing_cidade: string | null;
+  billing_uf: string | null;
   /** Só é preenchido depois que o código enviado para o número volta pelo app. */
   phone: string | null;
   phone_pending: string | null;
@@ -124,6 +136,9 @@ export type Subscription = {
   subscription_id: string | null;
   status: StatusAssinatura;
   valid_until: string | null;
+  /** O que dá para mostrar de um cartão sem guardar cartão nenhum. */
+  card_brand: string | null;
+  card_last4: string | null;
   last_event_id: string | null;
   created_at: string;
   updated_at: string;

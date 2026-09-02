@@ -65,7 +65,7 @@ export function PainelNotificacoes({ reminders }: { reminders: Reminder[] }) {
         type="button"
         onClick={() => setAberto(true)}
         aria-label={pendentes > 0 ? `Ver ${pendentes} avisos` : "Ver avisos"}
-        className="btn3d btn3d--surface btn3d--icon relative"
+        className="btn btn--surface btn--icon relative"
       >
         <Bell className="size-[1.15em]" aria-hidden />
         {montado && pendentes > 0 && (
@@ -117,10 +117,10 @@ export function PainelNotificacoes({ reminders }: { reminders: Reminder[] }) {
         )}
 
         <div className="mt-6 flex flex-col gap-2">
-          <Link href="/inbox" onClick={fechar} className="btn3d btn3d--primary btn3d--block">
+          <Link href="/inbox" onClick={fechar} className="btn btn--primary btn--block">
             {pendentes === 0 ? "Ir para o app" : "Ver tudo"}
           </Link>
-          <Link href="/calendario" onClick={fechar} className="btn3d btn3d--ghost btn3d--block">
+          <Link href="/calendario" onClick={fechar} className="btn btn--ghost btn--block">
             Ver no calendário
           </Link>
         </div>

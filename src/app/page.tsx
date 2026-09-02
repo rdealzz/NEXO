@@ -19,28 +19,30 @@ export default function Home() {
       {/* A malha fica atrás da marca e dos botões — e o degradê no rodapé dela
           entrega a página sem uma emenda dura. */}
       <section className="relative isolate min-h-[34rem] overflow-hidden">
-        {/* z-0 fecha o empilhamento da malha dentro deste wrapper: sem isso a
-            camada interna dela (z-20) passaria por cima dos botões. */}
-        <div className="absolute inset-0 z-0">
+        {/* Dois ajustes neste wrapper, nenhum tocando o componente:
+            z-0 fecha o empilhamento da malha aqui dentro (a camada interna dela
+            é z-20 e passaria por cima dos botões), e `invert` troca o claro pelo
+            escuro — o bloco fica preto no tema claro e branco no escuro. */}
+        <div className="malha-contraste absolute inset-0 z-0">
           <HelixChronoMatrix headline="" className="[&_header]:hidden" />
         </div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-background" />
 
         {/* O conteúdo não captura o mouse: assim a malha continua reagindo ao
             movimento em todo o herói, e só os controles recebem o clique. */}
-        <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-2xl flex-col px-4 py-10 [&_a]:pointer-events-auto [&_button]:pointer-events-auto sm:py-14">
+        <div className="sobre-contraste pointer-events-none relative z-10 mx-auto flex w-full max-w-2xl flex-col px-4 py-10 [&_a]:pointer-events-auto [&_button]:pointer-events-auto sm:py-14">
           <header className="flex items-center justify-between gap-4">
-            <MarcaNexo simbolo="size-9" wordmark="h-4" className="text-neutral-900 dark:text-white" />
+            <MarcaNexo simbolo="size-9" wordmark="h-4" className="text-white dark:text-neutral-900" />
             <AlternadorTema />
           </header>
 
-          <h1 className="mt-10 text-4xl font-semibold leading-[1.1] tracking-tight text-neutral-900 sm:text-5xl dark:text-white">
+          <h1 className="mt-10 text-4xl font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl dark:text-neutral-900">
             Joga aqui.
             <br />
             Eu lembro.
           </h1>
 
-          <p className="mt-5 max-w-md text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="mt-5 max-w-md text-lg text-neutral-300 dark:text-neutral-600">
             Uma foto, um áudio, um print, um PDF, um e-mail encaminhado, ou só uma frase. O NEXO lê, entende o
             que precisa acontecer e avisa você na hora certa. Você não cadastra tarefa nenhuma.
           </p>
