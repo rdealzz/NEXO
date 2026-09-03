@@ -40,3 +40,9 @@ export function avatarPadrao(semente: string): Avatar {
   for (let i = 0; i < semente.length; i += 1) soma = (soma + semente.charCodeAt(i) * (i + 1)) % 9973;
   return AVATARES[soma % AVATARES.length];
 }
+
+/**
+ * Onde a escolha fica para quem ainda não tem conta. Com conta, o bicho mora no
+ * perfil (campo avatar_id) e vale em qualquer aparelho.
+ */
+export const CHAVE_AVATAR = "nexo:avatar";

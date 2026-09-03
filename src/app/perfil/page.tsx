@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 
 import { PainelAssinatura } from "@/components/assinatura/painel-assinatura";
 import { ExcluirConta } from "@/components/legal/excluir-conta";
+import { AbasPerfil } from "@/components/perfil/abas";
 import { Cartao } from "@/components/perfil/cartao";
 import { Cobranca } from "@/components/perfil/cobranca";
 import { Identidade } from "@/components/perfil/identidade";
+import { PlanoAtual } from "@/components/perfil/plano";
 import { AtivarAvisos } from "@/components/permissoes/avisos";
 import { MarcaNexo } from "@/components/ui/logo";
 import { AlternadorTema, EscolhaTema } from "@/components/ui/tema";
@@ -18,14 +20,14 @@ import { currentUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Perfil — NEXO" };
+export const metadata: Metadata = { title: "Minha conta — NEXO" };
 
 /**
- * O perfil.
+ * A conta.
  *
- * Um lugar só para tudo que é da pessoa: quem ela é, o que ela paga, como o
- * NEXO fala com ela e como ela vai embora. Espalhar isso em várias telas é o
- * que faz alguém desistir de procurar.
+ * Um lugar só para tudo que é da pessoa — quem ela é, o que ela paga, como o
+ * NEXO fala com ela e como ela vai embora — dividido em abas, para que cada
+ * assunto tenha endereço fixo em vez de virar uma rolagem única.
  */
 export default async function PerfilPage() {
   const user = await currentUser();
@@ -50,82 +52,141 @@ export default async function PerfilPage() {
         </div>
       </header>
 
-      <h1 className="text-2xl font-semibold tracking-tight">Perfil</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Minha conta</h1>
       <p className="mt-1 text-sm text-muted">Olá, {nomeDe(perfil)}.</p>
 
-      <Secao titulo="Você">
-        <Identidade
-          nomeInicial={perfil.display_name ?? ""}
-          avatarInicial={perfil.avatar_id}
-          email={perfil.email}
-        />
-      </Secao>
+      <AbasPerfil
+        abas={[
+          {
+            id: "voce",
+            nome: "Você",
+            conteudo: (
+              <Secao titulo="Nome e retrato">
+                <Identidade
+                  nomeInicial={perfil.display_name ?? ""}
+                  avatarInicial={perfil.avatar_id}
+                  email={perfil.email}
+                />
+              </Secao>
+            ),
+          },
+          {
+            id: "plano",
+            nome: "Plano",
+            conteudo: (
+              <>
+                <Secao titulo="Plano atual">
+                  <PlanoAtual acesso={acesso} />
+                </Secao>
+                <Secao
+                  titulo="Assinatura"
+                  descricao="Assinar, retomar um pagamento pendente ou cancelar. Cancelar não corta nada na hora: o acesso segue até o fim do período pago."
+                >
+                  <PainelAssinatura acesso={acesso} disponivel={asaasConfigurado()} />
+                </Secao>
+              </>
+            ),
+          },
+          {
+            id: "pagamento",
+            nome: "Pagamento",
+            conteudo: (
+              <>
+                <Secao titulo="Cartões" descricao="O NEXO nunca vê o número — ele fica com o provedor de pagamento.">
+                  <Cartao assinatura={assinatura} />
+                </Secao>
+                <Secao
+                  titulo="Endereço de cobrança"
+                  descricao="Boleto e Pix pedem o endereço do pagador. O CEP preenche o resto sozinho."
+                >
+                  <Cobranca perfil={perfil} />
+                </Secao>
+              </>
+            ),
+          },
+          {
+            id: "avisos",
+            nome: "Avisos",
+            conteudo: (
+              <>
+                <Secao
+                  titulo="Avisos no aparelho"
+                  descricao="É por aqui que o NEXO cumpre a promessa: o aviso chega mesmo com o app fechado."
+                >
+                  <AtivarAvisos chavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
+                </Secao>
+                <Secao titulo="Entrada por fora do app" descricao="Encaminhe um e-mail e ele vira lembrete.">
+                  {endereco ? (
+                    <p className="mt-3 select-all rounded-xl bg-accent-soft px-3 py-2 font-mono text-sm">
+                      {endereco}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-sm text-muted">
+                      Ainda não configurado neste ambiente (falta{" "}
+                      <code className="font-mono">INBOUND_EMAIL_DOMAIN</code>).
+                    </p>
+                  )}
+                  <Link
+                    href="/configuracoes"
+                    className="mt-3 inline-block text-sm text-accent underline underline-offset-4"
+                  >
+                    WhatsApp e outros canais
+                  </Link>
+                </Secao>
+              </>
+            ),
+          },
+          {
+            id: "aparencia",
+            nome: "Aparência",
+            conteudo: (
+              <Secao
+                titulo="Tema"
+                descricao="O NEXO abre no claro e só muda quando você manda. A escolha fica valendo neste aparelho."
+              >
+                <EscolhaTema />
+              </Secao>
+            ),
+          },
+          {
+            id: "conta",
+            nome: "Conta",
+            conteudo: (
+              <>
+                <Secao titulo="Sobre e legal">
+                  <div className="mt-2 divide-y divide-line">
+                    <Link
+                      href="/legal/termos"
+                      className="flex items-center justify-between py-2.5 text-sm hover:text-accent"
+                    >
+                      Termos de Uso <span aria-hidden className="text-muted">›</span>
+                    </Link>
+                    <Link
+                      href="/legal/privacidade"
+                      className="flex items-center justify-between py-2.5 text-sm hover:text-accent"
+                    >
+                      Política de Privacidade <span aria-hidden className="text-muted">›</span>
+                    </Link>
+                  </div>
+                  <p className="mt-3 rounded-xl bg-accent-soft px-3 py-2 text-xs leading-snug text-accent">
+                    Seus dados pessoais não treinam nenhuma inteligência artificial.
+                  </p>
+                </Secao>
 
-      <Secao titulo="Assinatura">
-        <PainelAssinatura acesso={acesso} disponivel={asaasConfigurado()} />
-      </Secao>
-
-      <Secao titulo="Forma de pagamento">
-        <Cartao assinatura={assinatura} />
-      </Secao>
-
-      <Secao
-        titulo="Endereço de cobrança"
-        descricao="Boleto e Pix pedem o endereço do pagador. O CEP preenche o resto sozinho."
-      >
-        <Cobranca perfil={perfil} />
-      </Secao>
-
-      <Secao
-        titulo="Avisos"
-        descricao="É por aqui que o NEXO cumpre a promessa: o aviso chega mesmo com o app fechado."
-      >
-        <AtivarAvisos chavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
-      </Secao>
-
-      <Secao titulo="Aparência" descricao="O NEXO abre no claro. O escuro fica valendo neste aparelho.">
-        <EscolhaTema />
-      </Secao>
-
-      <Secao titulo="Entrada por fora do app" descricao="Encaminhe um e-mail e ele vira lembrete.">
-        {endereco ? (
-          <p className="mt-3 select-all rounded-xl bg-accent-soft px-3 py-2 font-mono text-sm">{endereco}</p>
-        ) : (
-          <p className="mt-2 text-sm text-muted">
-            Ainda não configurado neste ambiente (falta <code className="font-mono">INBOUND_EMAIL_DOMAIN</code>).
-          </p>
-        )}
-        <Link href="/configuracoes" className="mt-3 inline-block text-sm text-accent underline underline-offset-4">
-          WhatsApp e outros canais
-        </Link>
-      </Secao>
-
-      <Secao titulo="Sobre e legal">
-        <div className="mt-2 divide-y divide-line">
-          <Link href="/legal/termos" className="flex items-center justify-between py-2.5 text-sm hover:text-accent">
-            Termos de Uso <span aria-hidden className="text-muted">›</span>
-          </Link>
-          <Link
-            href="/legal/privacidade"
-            className="flex items-center justify-between py-2.5 text-sm hover:text-accent"
-          >
-            Política de Privacidade <span aria-hidden className="text-muted">›</span>
-          </Link>
-        </div>
-        <p className="mt-3 rounded-xl bg-accent-soft px-3 py-2 text-xs leading-snug text-accent">
-          Seus dados pessoais não treinam nenhuma inteligência artificial.
-        </p>
-      </Secao>
-
-      <section className="mt-4 rounded-2xl border border-danger/30 bg-surface p-4">
-        <h2 className="text-sm font-semibold">Excluir minha conta</h2>
-        <p className="mt-1 text-sm text-muted">
-          Apaga permanentemente lembretes, capturas, arquivos, compras e o login. É definitivo.
-        </p>
-        <div className="mt-3">
-          <ExcluirConta email={user.email} />
-        </div>
-      </section>
+                <section className="mt-4 rounded-2xl border border-danger/30 bg-surface p-4">
+                  <h2 className="text-sm font-semibold">Excluir minha conta</h2>
+                  <p className="mt-1 text-sm text-muted">
+                    Apaga permanentemente lembretes, capturas, arquivos, compras e o login. É definitivo.
+                  </p>
+                  <div className="mt-3">
+                    <ExcluirConta email={user.email} />
+                  </div>
+                </section>
+              </>
+            ),
+          },
+        ]}
+      />
     </main>
   );
 }
