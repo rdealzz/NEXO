@@ -7,16 +7,21 @@
  */
 @custom-variant dark (&:where([data-tema="escuro"], [data-tema="escuro"] *));
 
+/*
+ * Uma cor de fundo só, do topo ao rodapé: branco puro no claro, preto puro no
+ * escuro. Cartão, popover e barra usam o mesmo fundo da página — o que separa
+ * um bloco do outro é a linha, nunca uma faixa de cor diferente.
+ */
 :root {
-  --background: #f7f7f5;
+  --background: #ffffff;
   --surface: #ffffff;
-  --border: #e5e3de;
-  --foreground: #16150f;
-  --muted: #6d6a60;
+  --border: #e6e6e6;
+  --foreground: #111111;
+  --muted: #6b6b6b;
   --accent: #146b4f;
-  --accent-soft: #e3f2ea;
-  --danger: #e0483a;
-  --warning: #e5a11c;
+  --accent-soft: #e8f3ee;
+  --danger: #d93a2b;
+  --warning: #b8790a;
 
   /* Relevo dos botões 3D: brilho de cima, sombra de baixo, sombra projetada. */
   --btn-gloss: rgb(255 255 255 / 0.55);
@@ -56,13 +61,13 @@
  * atributo e herda a paleta inteira.
  */
 [data-tema="escuro"] {
-  --background: #0d0e0c;
-  --surface: #161815;
-  --border: #262a25;
-  --foreground: #ececea;
-  --muted: #9b9a92;
+  --background: #000000;
+  --surface: #000000;
+  --border: #242424;
+  --foreground: #ededed;
+  --muted: #9a9a9a;
   --accent: #4ade9f;
-  --accent-soft: #14261f;
+  --accent-soft: #10251c;
   --danger: #ff6b5c;
   --warning: #f0b83c;
 
@@ -326,47 +331,14 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   A malha de contraste
+   A malha
    ---------------------------------------------------------------------------
-   O bloco fica preto quando o site está no claro, e branco quando está no
-   escuro — o contrário do resto da página, de propósito.
-
-   O componente que desenha a malha decide a própria cor lendo o sistema
-   operacional, e não dá para mudar isso sem editá-lo. Então o filtro só entra
-   nas combinações em que ele erraria o lado: quando o sistema concorda com o
-   tema do app, invertemos; quando discorda, ele já pinta o lado certo sozinho.
+   A malha não tem mais fundo próprio: ela desenha direto sobre o fundo da
+   página, então o herói é a mesma cor do resto do app — branco no claro, preto
+   no escuro — e não existe mais um bloco invertido no topo.
 --------------------------------------------------------------------------- */
-.malha-contraste {
-  /* Sistema claro e app claro: o componente pinta claro, então invertemos. */
-  filter: invert(1);
-}
-
-@media (prefers-color-scheme: dark) {
-  .malha-contraste {
-    /* Sistema escuro força o componente a pintar escuro; já está preto. */
-    filter: none;
-  }
-}
-
-:root[data-tema="escuro"] .malha-contraste {
-  /* No tema escuro o app marca a classe `dark`, então o componente pinta
-     escuro em qualquer sistema — e aí o filtro é sempre necessário. */
-  filter: invert(1);
-}
-
-/*
- * Controles em cima do bloco de contraste. Como o bloco é sempre o oposto da
- * página, o cinza de preenchimento e a cor do texto também precisam inverter —
- * senão o botão secundário some no preto.
- */
-.sobre-contraste .btn--surface {
-  --btn-face: rgb(255 255 255 / 0.16);
-  --btn-ink: #ffffff;
-}
-
-:root[data-tema="escuro"] .sobre-contraste .btn--surface {
-  --btn-face: rgb(0 0 0 / 0.08);
-  --btn-ink: #16150f;
+.malha {
+  color: var(--foreground);
 }
 
 /* Dia que tem lembrete: um ponto embaixo do número. */

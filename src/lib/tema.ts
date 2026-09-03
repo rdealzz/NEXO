@@ -11,7 +11,7 @@ export const CHAVE_TEMA = "nexo:tema";
 export const TEMA_PADRAO: Tema = "claro";
 
 /** A cor da barra do navegador/sistema em cada tema. */
-export const COR_DA_BARRA = { claro: "#f7f7f5", escuro: "#0d0e0c" } as const;
+export const COR_DA_BARRA = { claro: "#ffffff", escuro: "#000000" } as const;
 
 export const TEMAS: { id: Tema; nome: string; descricao: string }[] = [
   { id: "claro", nome: "Claro", descricao: "Como o app abre por padrão." },

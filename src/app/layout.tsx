@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 // Uma cor só: o app abre claro. O script do tema troca esta meta quando a
 // pessoa escolhe escuro.
-export const viewport: Viewport = { themeColor: "#f7f7f5" };
+export const viewport: Viewport = { themeColor: "#ffffff" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

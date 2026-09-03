@@ -44,12 +44,12 @@ export function Abertura() {
       onClick={pular}
       role="presentation"
       aria-hidden
-      className={`fixed inset-0 z-[60] transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[60] bg-background transition-opacity duration-500 ${
         saindo ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
-      {/* Invertida junto com o herói: preta no tema claro, branca no escuro. */}
-      <div className="malha-contraste absolute inset-0">
+      {/* A malha sobre o fundo da página: branco no claro, preto no escuro. */}
+      <div className="malha absolute inset-0">
         <HelixChronoMatrix headline="" className="[&_header]:hidden" />
       </div>
 
@@ -57,9 +57,9 @@ export function Abertura() {
         <MarcaNexo
           simbolo="size-16 sm:size-20"
           wordmark="h-7 sm:h-9"
-          className="gap-4 text-white dark:text-neutral-900"
+          className="gap-4 text-foreground"
         />
-        <p className="font-medium text-neutral-300 dark:text-neutral-600">Joga aqui. Eu lembro.</p>
+        <p className="font-medium text-muted">Joga aqui. Eu lembro.</p>
       </div>
     </div>
   );

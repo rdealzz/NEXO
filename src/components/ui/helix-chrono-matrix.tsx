@@ -43,17 +43,20 @@ export function HelixChronoMatrix({
     const containerRef = useRef<HTMLDivElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const [isRunning, setIsRunning] = useState(true);
     const [topology, setTopology] = useState<TopologyMode>('DOUBLE_HELIX');
 
-    // Sync theme
+    // O tema vem do app (o atributo data-tema no <html>), não do sistema
+    // operacional: quem escolheu claro vê a malha clara mesmo com o celular no
+    // escuro. O observer pega a troca no alternador, sem recarregar a página.
     useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        setIsDarkMode(mediaQuery.matches);
-        const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
-        mediaQuery.addEventListener('change', handler);
-        return () => mediaQuery.removeEventListener('change', handler);
+        const raiz = document.documentElement;
+        const ler = () => setIsDarkMode(raiz.dataset.tema === 'escuro');
+        ler();
+        const observer = new MutationObserver(ler);
+        observer.observe(raiz, { attributes: true, attributeFilter: ['data-tema'] });
+        return () => observer.disconnect();
     }, []);
 
     // Smooth pointer ref
@@ -192,12 +195,12 @@ export function HelixChronoMatrix({
             pointer.x += (pointer.targetX - pointer.x) * 0.1;
             pointer.y += (pointer.targetY - pointer.y) * 0.1;
 
-            const isDark = document.documentElement.classList.contains('dark') || isDarkMode;
-            const bgColor = isDark ? '#090a0f' : '#f8fafc';
-            const strokeBase = isDark ? '255, 255, 255' : '15, 23, 42';
+            const isDark = isDarkMode;
+            const strokeBase = isDark ? '255, 255, 255' : '17, 17, 17';
 
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, width, height);
+            // Sem fundo próprio: o canvas é limpo e o branco (ou preto) da
+            // página aparece atrás dos fios.
+            ctx.clearRect(0, 0, width, height);
 
             const centerX = width / 2;
             const centerY = height / 2;
@@ -382,7 +385,7 @@ export function HelixChronoMatrix({
             onMouseMove={handlePointerMove}
             onMouseLeave={handlePointerLeave}
             className={cn(
-                "group relative flex h-full w-full select-none flex-col justify-between overflow-hidden bg-slate-50 transition-colors duration-700 dark:bg-[#090a0f]",
+                "group relative flex h-full w-full select-none flex-col justify-between overflow-hidden bg-transparent",
                 className
             )}
         >
