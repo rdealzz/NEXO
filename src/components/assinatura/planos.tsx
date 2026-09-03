@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Botao } from "@/components/ui/button";
@@ -29,6 +30,7 @@ export function Planos({
   autenticado: boolean;
   inicial?: Plano["id"];
 }) {
+  const router = useRouter();
   const [escolhido, setEscolhido] = useState<Plano["id"]>(inicial);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -36,7 +38,7 @@ export function Planos({
   async function assinar() {
     if (!autenticado) {
       // Assinar sem conta criaria uma cobrança órfã, sem dono a quem liberar.
-      window.location.href = `/entrar?plano=${escolhido}`;
+      router.push(`/entrar?plano=${escolhido}`);
       return;
     }
 

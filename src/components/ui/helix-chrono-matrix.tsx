@@ -128,7 +128,7 @@ export function HelixChronoMatrix({
         const canvas = canvasRef.current;
         if (!container || !canvas) return;
 
-        const ctx = canvas.getContext('2d', { alpha: false });
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
         const resizeObserver = new ResizeObserver((entries) => {
@@ -168,7 +168,7 @@ export function HelixChronoMatrix({
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const ctx = canvas.getContext('2d', { alpha: false });
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
         let animId = 0;
@@ -198,8 +198,10 @@ export function HelixChronoMatrix({
             const isDark = isDarkMode;
             const strokeBase = isDark ? '255, 255, 255' : '17, 17, 17';
 
-            // Sem fundo próprio: o canvas é limpo e o branco (ou preto) da
-            // página aparece atrás dos fios.
+            // Sem fundo próprio: o canvas é limpo de verdade — por isso o
+            // contexto é criado com alpha (com `alpha: false` o canvas é opaco e
+            // clearRect pinta preto, que era o bloco escuro do topo da página) —
+            // e o branco, ou o preto, da página aparece atrás dos fios.
             ctx.clearRect(0, 0, width, height);
 
             const centerX = width / 2;

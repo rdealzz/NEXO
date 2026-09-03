@@ -122,7 +122,7 @@ export function InboxClient({ initialReminders }: { initialReminders: Reminder[]
       <DropArea busy={busy} onCapture={(payload) => runCapture(payload)} />
 
       {error && (
-        <p className="rounded-xl border border-[#e0483a]/40 bg-[#e0483a]/10 px-4 py-3 text-sm text-[#e0483a]">
+        <p className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
           {error}
         </p>
       )}

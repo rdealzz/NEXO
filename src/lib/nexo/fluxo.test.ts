@@ -27,11 +27,11 @@ function boletoLidoDaFoto(vencimento: string): SuggestedReminder {
     // 4 dias antes, 1 dia antes e no dia: é assim que um vencimento avisa.
     lead_minutes: [5760, 1440, 0],
     repeat_rule: null,
-    category: "conta",
+    category: "financeiro",
     why: "Vencimento lido no boleto fotografado",
     confidence: 0.94,
-    entity_name: "Enel",
-  } as SuggestedReminder;
+    source_quote: "Vencimento: 10/09",
+  };
 }
 
 /** O mesmo caminho do POST /api/reminders quando a pessoa confirma. */
@@ -47,7 +47,8 @@ async function confirmar(dono: string, sugestoes: SuggestedReminder[], agora: Da
       category: s.category,
       why: s.why,
       confidence: s.confidence,
-      entity_name: s.entity_name,
+      // Quem preenche isto no app é a entidade da análise, não a sugestão.
+      entity_name: null,
       capture_id: null,
     })),
   );
@@ -111,8 +112,8 @@ test("o despachante encontra o aviso quando a hora chega", async () => {
         category: "saude",
         why: "Print do WhatsApp",
         confidence: 0.9,
-        entity_name: null,
-      } as SuggestedReminder,
+        source_quote: "consulta quinta 9h",
+      },
     ],
     agora,
   );
@@ -144,7 +145,7 @@ test("antecedência que já passou não vira aviso atrasado", async () => {
   // 30 dias antes de amanhã é o mês passado: aquele aviso não existe mais.
   const [lembrete] = await confirmar(
     dono,
-    [{ ...boletoLidoDaFoto(amanha), lead_minutes: [43200, 1440, 0] } as SuggestedReminder],
+    [{ ...boletoLidoDaFoto(amanha), lead_minutes: [43200, 1440, 0] }],
     agora,
   );
 

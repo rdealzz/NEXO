@@ -64,6 +64,12 @@ export default async function EntrarPage({
   const { erro, enviado } = await searchParams;
   if (await currentUser()) redirect("/inbox");
 
+  // Sem as variáveis do Supabase não existe login neste ambiente. Isso é dito
+  // antes dos campos, e os botões ficam desligados: um formulário que aceita o
+  // toque e não faz nada é pior que um formulário ausente — a pessoa acha que
+  // errou o e-mail e tenta de novo.
+  const configurado = authConfigured();
+
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-16">
       <header className="flex items-center justify-between gap-4">
@@ -78,6 +84,20 @@ export default async function EntrarPage({
         sua conta.
       </p>
 
+      {!configurado && (
+        <div className="mt-6 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
+          <p className="font-medium">O login ainda não está ligado neste ambiente.</p>
+          <p className="mt-1 text-muted">
+            Faltam as variáveis <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_URL</code> e{" "}
+            <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>. Enquanto isso o NEXO funciona
+            sem conta, e os lembretes ficam guardados neste aparelho.
+          </p>
+          <Link href="/inbox" className="mt-2 inline-block text-accent underline underline-offset-4">
+            Usar sem conta
+          </Link>
+        </div>
+      )}
+
       {enviado ? (
         <p className="mt-6 rounded-xl bg-accent-soft px-4 py-3 text-sm">
           Link enviado. Abra o e-mail neste mesmo aparelho.
@@ -90,9 +110,10 @@ export default async function EntrarPage({
             required
             autoComplete="email"
             placeholder="voce@email.com"
-            className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent"
+            disabled={!configurado}
+            className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent disabled:opacity-50"
           />
-          <Botao type="submit" variant="primary" size="lg" block>
+          <Botao type="submit" variant="primary" size="lg" block disabled={!configurado}>
             Me manda o link
           </Botao>
         </form>
@@ -106,7 +127,14 @@ export default async function EntrarPage({
             <span className="h-px flex-1 bg-[var(--border)]" />
           </div>
 
-          <BotaoAncora href="/auth/google" variant="surface" size="lg" block className="mt-4">
+          <BotaoAncora
+            href={configurado ? "/auth/google" : "#"}
+            aria-disabled={!configurado}
+            variant="surface"
+            size="lg"
+            block
+            className="mt-4"
+          >
             Continuar com Google
           </BotaoAncora>
 
@@ -128,9 +156,10 @@ export default async function EntrarPage({
                 minLength={8}
                 autoComplete="current-password"
                 placeholder="senha (mínimo 8 caracteres)"
-                className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent"
+                disabled={!configurado}
+                className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent disabled:opacity-50"
               />
-              <Botao type="submit" variant="surface" size="lg" block>
+              <Botao type="submit" variant="surface" size="lg" block disabled={!configurado}>
                 Entrar ou criar conta
               </Botao>
             </form>
@@ -138,17 +167,7 @@ export default async function EntrarPage({
         </>
       )}
 
-      {erro && <p className="mt-4 text-sm text-[#e0483a]">{ERROS[erro] ?? "Algo deu errado."}</p>}
-
-      {!authConfigured() && (
-        <p className="mt-6 text-sm text-muted">
-          Este ambiente está sem as variáveis do Supabase — dá para usar o NEXO sem conta, os lembretes ficam neste
-          aparelho.{" "}
-          <Link href="/inbox" className="underline underline-offset-4">
-            Ir para a caixa
-          </Link>
-        </p>
-      )}
+      {erro && <p className="mt-4 text-sm text-danger">{ERROS[erro] ?? "Algo deu errado."}</p>}
     </main>
   );
 }

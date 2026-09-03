@@ -75,7 +75,7 @@ export default async function ConfiguracoesPage({
         </Link>
       </p>
 
-      {erro && <p className="mt-4 text-sm text-[#e0483a]">{MENSAGENS[erro] ?? "Algo deu errado."}</p>}
+      {erro && <p className="mt-4 text-sm text-danger">{MENSAGENS[erro] ?? "Algo deu errado."}</p>}
       {vinculado && <p className="mt-4 text-sm text-accent">Telefone vinculado. Pode me mandar coisas por lá.</p>}
 
       <section className="mt-8 rounded-2xl border border-line bg-surface p-4">

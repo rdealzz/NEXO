@@ -173,7 +173,8 @@ export function Camera({ onFoto, onFechar, onNegada, jaConcedida = false }: Prop
           </div>
         )}
 
-        <div className="absolute inset-x-0 top-0 flex items-center justify-between p-4">
+        {/* Tela cheia de verdade: os controles descem abaixo do notch. */}
+        <div className="absolute inset-x-0 top-0 flex items-center justify-between p-4 pt-[calc(1rem+env(safe-area-inset-top))]">
           <Botao size="sm" variant="surface" onClick={fechar}>
             Cancelar
           </Botao>
@@ -195,7 +196,7 @@ export function Camera({ onFoto, onFechar, onNegada, jaConcedida = false }: Prop
         />
       </div>
 
-      <p className="bg-black pb-6 text-center text-xs text-white/60">
+      <p className="bg-black pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-center text-xs text-white/60">
         Nada vira lembrete sem você confirmar.
       </p>
     </div>

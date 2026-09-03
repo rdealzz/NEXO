@@ -98,7 +98,9 @@ function Item({
           type="button"
           onClick={() => onComplete(reminder.id)}
           aria-label={`Concluir ${reminder.title}`}
-          className="dot3d mt-0.5 size-5 shrink-0 cursor-pointer border-2 transition-colors hover:border-accent"
+          // `alvo-toque` estica a área clicável para além do desenho no celular:
+          // o ponto continua com 20px, mas o dedo acerta uma área de 44px.
+          className="dot3d alvo-toque mt-0.5 size-5 shrink-0 cursor-pointer border-2 transition-colors hover:border-accent"
           style={{ borderColor: urgencyColor(reminder.due_date) }}
         />
         <div className="min-w-0 flex-1">

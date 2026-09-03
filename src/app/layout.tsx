@@ -23,7 +23,16 @@ export const metadata: Metadata = {
 
 // Uma cor só: o app abre claro. O script do tema troca esta meta quando a
 // pessoa escolhe escuro.
-export const viewport: Viewport = { themeColor: "#ffffff" };
+//
+// `viewportFit: cover` deixa o fundo ir até a borda do iPhone; quem cuida de
+// não esconder conteúdo atrás do notch e da barra de gestos é o padding de
+// área segura no body (ver globals.css).
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

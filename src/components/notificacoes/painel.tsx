@@ -96,7 +96,7 @@ export function PainelNotificacoes({ reminders }: { reminders: Reminder[] }) {
             <p className="mt-1 text-sm text-muted">
               {pendentes === 0
                 ? "Você está em dia. Joga aqui o que não pode esquecer."
-                : "O mais urgente na frente. Passe o mouse para ver as de trás."}
+                : "O mais urgente na frente."}
             </p>
           </div>
           <Botao
@@ -111,9 +111,43 @@ export function PainelNotificacoes({ reminders }: { reminders: Reminder[] }) {
         </header>
 
         {pendentes > 0 && (
-          <div className="mb-14 mt-8 flex justify-center overflow-hidden">
-            <DisplayCards cards={urgentes.slice(0, 3).map(carta)} />
-          </div>
+          <>
+            {/*
+              O leque de cartas depende de hover e de 22rem de largura: no
+              celular ele não abre e não cabe. Lá a mesma informação vira lista,
+              que é como o telefone mostra aviso desde sempre.
+            */}
+            <ul className="mt-6 space-y-2 sm:hidden">
+              {urgentes.slice(0, 3).map((lembrete) => {
+                const dias = daysUntil(lembrete.due_date!);
+                return (
+                  <li key={lembrete.id} className="flex items-start gap-3 rounded-xl border border-line p-3">
+                    <span aria-hidden className="mt-0.5 shrink-0 rounded-lg bg-accent p-1.5">
+                      {iconePara(lembrete, dias < 0)}
+                    </span>
+                    <div className="min-w-0">
+                      <p
+                        className={`text-xs font-semibold ${
+                          dias < 0 ? "text-danger" : dias === 0 ? "text-warning" : "text-accent"
+                        }`}
+                      >
+                        {dias < 0 ? "Atrasado" : dias === 0 ? "Hoje" : CATEGORY_LABEL[lembrete.category]}
+                      </p>
+                      <p className="text-sm font-medium">{lembrete.title}</p>
+                      <p className="mt-0.5 text-xs text-muted">
+                        {humanDate(lembrete.due_date!)}
+                        {lembrete.due_time ? ` · ${lembrete.due_time}` : ""}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="mb-14 mt-8 hidden justify-center overflow-hidden sm:flex">
+              <DisplayCards cards={urgentes.slice(0, 3).map(carta)} />
+            </div>
+          </>
         )}
 
         <div className="mt-6 flex flex-col gap-2">

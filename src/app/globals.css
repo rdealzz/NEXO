@@ -130,6 +130,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  /* O NEXO é usado quase todo no celular, então o app respeita a área segura:
+     sem isto, o rodapé fica atrás da barra de gestos do iPhone. */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Texto legal: medida curta e linha alta, para ser lido de verdade. */
@@ -409,4 +412,51 @@ body {
 
 .dia-com-lembrete[data-selected="true"] button::after {
   background: var(--primary-foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   Celular
+   ---------------------------------------------------------------------------
+   A maioria dos acessos é no telefone, então estas regras valem no app inteiro
+   quando o ponteiro é o dedo — e ficam no fim do arquivo de propósito: media
+   query não soma especificidade, então precisam vir depois das medidas dos
+   botões para poder aumentá-las.
+
+   1. Campo com menos de 16px faz o Safari dar zoom sozinho ao focar, e a pessoa
+      perde o enquadramento no meio de um cadastro.
+   2. Alvo de toque abaixo de 44px erra — é a medida da Apple. No celular o
+      botão pequeno pode ser mais estreito, nunca mais baixo.
+--------------------------------------------------------------------------- */
+.alvo-toque {
+  position: relative;
+}
+
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+
+  .btn {
+    min-height: 2.75rem;
+  }
+
+  .btn--sm,
+  .btn--chip {
+    min-height: 2.5rem;
+  }
+
+  .btn--icon {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  /* Alarga a área de toque sem alargar o desenho — para peças que precisam
+     continuar pequenas, como o ponto de concluir e a caixa de seleção. */
+  .alvo-toque::after {
+    content: "";
+    position: absolute;
+    inset: -0.6rem;
+  }
 }

@@ -159,7 +159,7 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
                   type="checkbox"
                   checked={row.selected}
                   onChange={(event) => patch(row.key, { selected: event.target.checked })}
-                  className="mt-1 size-4 shrink-0 accent-[var(--accent)]"
+                  className="alvo-toque mt-1 size-5 shrink-0 accent-[var(--accent)]"
                   aria-label={`Criar lembrete: ${row.title}`}
                 />
                 <div className="min-w-0 flex-1">
@@ -190,7 +190,7 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
                   </div>
 
                   {row.uncertain && (
-                    <p className="mt-2 text-xs text-[#e5a11c]">
+                    <p className="mt-2 text-xs text-warning">
                       Não tenho certeza dessa data — confere antes de confirmar.
                     </p>
                   )}

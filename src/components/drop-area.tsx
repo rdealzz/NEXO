@@ -207,27 +207,35 @@ export function DropArea({ busy, onCapture }: Props) {
         </div>
       )}
 
-      {speechError && <p className="mb-3 text-sm text-[#e0483a]">{speechError}</p>}
+      {speechError && <p className="mb-3 text-sm text-danger">{speechError}</p>}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <ToolButton onClick={pedirCamera} disabled={busy}>
-          Câmera
-        </ToolButton>
-        <ToolButton onClick={pedirGaleria} disabled={busy}>
-          Galeria
-        </ToolButton>
-        <ToolButton onClick={() => fileInput.current?.click()} disabled={busy}>
-          Arquivo
-        </ToolButton>
-        <ToolButton onClick={toggleMic} disabled={busy} active={listening}>
-          {listening ? "Ouvindo…" : "Falar"}
-        </ToolButton>
+      {/*
+        No celular as quatro entradas dividem a linha em partes iguais e o
+        "Mandar" fica sozinho embaixo, ocupando a largura toda: é o alvo mais
+        importante da tela e o mais fácil de alcançar com o polegar. A partir do
+        sm tudo volta para uma linha só, com o Mandar à direita.
+      */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-2">
+          <ToolButton onClick={pedirCamera} disabled={busy}>
+            Câmera
+          </ToolButton>
+          <ToolButton onClick={pedirGaleria} disabled={busy}>
+            Galeria
+          </ToolButton>
+          <ToolButton onClick={() => fileInput.current?.click()} disabled={busy}>
+            Arquivo
+          </ToolButton>
+          <ToolButton onClick={toggleMic} disabled={busy} active={listening}>
+            {listening ? "Ouvindo…" : "Falar"}
+          </ToolButton>
+        </div>
 
         <Botao
           variant="primary"
           onClick={send}
           disabled={busy || (!text.trim() && !pending)}
-          className="ml-auto"
+          className="w-full sm:ml-auto sm:w-auto"
         >
           {busy ? "Entendendo…" : "Mandar"}
         </Botao>
@@ -303,6 +311,8 @@ function ToolButton({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
+      // Preenche a coluna no celular e volta ao tamanho do texto no desktop.
+      className="w-full sm:w-auto"
     >
       {children}
     </Botao>
