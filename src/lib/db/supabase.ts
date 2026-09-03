@@ -12,6 +12,8 @@ import type {
   Subscription,
 } from "./types";
 
+import { chaveDeServico, urlDoSupabase } from "@/lib/supabase/credenciais";
+
 /**
  * Acesso pelo service role: as rotas do NEXO já resolvem o dono da requisição,
  * então o filtro por owner_id é feito aqui. As policies de RLS na migration
@@ -22,12 +24,12 @@ export const CAPTURE_BUCKET = "capturas";
 let cached: SupabaseClient | null = null;
 
 export function supabaseAvailable(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+  return Boolean(urlDoSupabase() && chaveDeServico());
 }
 
 function client(): SupabaseClient {
   if (!cached) {
-    cached = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    cached = createClient(urlDoSupabase()!, chaveDeServico()!, {
       auth: { persistSession: false },
     });
   }

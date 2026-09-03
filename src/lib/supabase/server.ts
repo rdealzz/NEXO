@@ -2,13 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { chaveAnonima, urlDoSupabase } from "./credenciais";
+
 /**
  * Cliente com a sessão do usuário, lida dos cookies. É só isto que sabe quem
  * está logado — o acesso aos dados continua passando pelo service role em
  * src/lib/db, que já filtra por owner_id.
  */
 export function authConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return Boolean(urlDoSupabase() && chaveAnonima());
 }
 
 export async function supabaseServer(): Promise<SupabaseClient | null> {
@@ -16,8 +18,8 @@ export async function supabaseServer(): Promise<SupabaseClient | null> {
   const jar = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    urlDoSupabase()!,
+    chaveAnonima()!,
     {
       cookies: {
         getAll: () => jar.getAll(),

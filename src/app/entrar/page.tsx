@@ -95,9 +95,9 @@ export default async function EntrarPage({
         <div className="mt-6 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
           <p className="font-medium">O login ainda não está ligado neste ambiente.</p>
           <p className="mt-1 text-muted">
-            Faltam as variáveis <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_URL</code> e{" "}
-            <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>. Enquanto isso o NEXO funciona
-            sem conta, e os lembretes ficam guardados neste aparelho.
+            Faltam as variáveis <code className="font-mono text-xs">SUPABASE_URL</code> e{" "}
+            <code className="font-mono text-xs">SUPABASE_ANON_KEY</code>. Enquanto isso o NEXO funciona sem conta,
+            e os lembretes ficam guardados neste aparelho.
           </p>
           <Link href="/inbox" className="mt-2 inline-block text-accent underline underline-offset-4">
             Usar sem conta
