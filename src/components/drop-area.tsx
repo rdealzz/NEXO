@@ -6,6 +6,7 @@ import { Camera } from "@/components/permissoes/camera";
 import { ModalPermissao } from "@/components/permissoes/modal-permissao";
 import { Botao } from "@/components/ui/button";
 import type { CaptureKind } from "@/lib/nexo/schema";
+import { vibrar } from "@/lib/tato";
 import {
   cameraDisponivel,
   estadoDaCamera,
@@ -47,6 +48,7 @@ export function DropArea({ busy, onCapture }: Props) {
 
   const send = useCallback(() => {
     if (busy) return;
+    vibrar("toque");
     if (pending) {
       onCapture({ kind: kindForFile(pending), text: text.trim() || undefined, file: pending });
       setPending(null);
@@ -68,6 +70,7 @@ export function DropArea({ busy, onCapture }: Props) {
   const fotografou = useCallback(
     (arquivo: File) => {
       setCameraAberta(null);
+      vibrar("captura");
       onCapture({ kind: "imagem", file: arquivo });
     },
     [onCapture],
@@ -171,9 +174,15 @@ export function DropArea({ busy, onCapture }: Props) {
         const file = event.dataTransfer.files[0];
         if (file) setPending(file);
       }}
-      className={`rounded-2xl border-2 border-dashed p-4 transition-colors sm:p-5 ${
+      /*
+       * O campo é o elemento mais importante do app, e por isso ele é o único
+       * que muda de estado sozinho: ganha foco e cresce um pouco; enquanto o
+       * NEXO lê o material, uma luz percorre a borda. Quem está esperando vê
+       * onde a espera acontece.
+       */
+      className={`campo-vivo rounded-2xl border-2 border-dashed p-4 sm:p-5 ${
         dragging ? "border-accent bg-accent-soft" : "border-line bg-surface"
-      }`}
+      } ${busy ? "campo-vivo--lendo" : ""}`}
     >
       <label htmlFor="nexo-drop" className="block text-sm font-medium text-muted">
         O que você não quer esquecer?

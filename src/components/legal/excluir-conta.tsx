@@ -65,7 +65,7 @@ export function ExcluirConta({ email }: { email: string | null }) {
           setErro(null);
         }}
         aria-labelledby="excluir-titulo"
-        className="m-auto w-[min(30rem,calc(100vw-2rem))] rounded-3xl border border-line bg-surface p-6 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+        className="vidro m-auto w-[min(30rem,calc(100vw-2rem))] rounded-3xl border p-6 text-foreground"
       >
         {pronto ? (
           <>

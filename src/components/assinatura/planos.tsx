@@ -76,7 +76,7 @@ export function Planos({
                 type="button"
                 onClick={() => setEscolhido(p.id)}
                 aria-pressed={marcado}
-                className={`relative flex h-full w-full flex-col items-start gap-1 rounded-2xl border-2 p-4 text-left transition-colors ${
+                className={`peca relative flex h-full w-full flex-col items-start gap-1 rounded-2xl border-2 p-4 text-left ${
                   marcado ? "border-accent bg-accent-soft" : "border-line hover:border-accent/40"
                 }`}
               >

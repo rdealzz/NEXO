@@ -145,7 +145,7 @@ export function ChipPerfil({
       {aberto && (
         <div
           id={painelId}
-          className="absolute left-0 top-full z-40 mt-2 w-[19rem] rounded-2xl border border-line bg-surface p-3 shadow-xl"
+          className="vidro absolute left-0 top-full z-40 mt-2 w-[19rem] rounded-2xl border p-3 shadow-xl"
         >
           <p className="px-1 text-xs font-semibold uppercase tracking-wide text-muted">Escolha seu bicho</p>
 

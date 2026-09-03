@@ -70,9 +70,9 @@ export function CalendarioClient({ reminders }: { reminders: Reminder[] }) {
             Nada marcado para este dia.
           </p>
         ) : (
-          <ul className="mt-3 space-y-2">
+          <ul className="entra-em-cascata mt-3 space-y-2">
             {doDia.map((lembrete) => (
-              <li key={lembrete.id} className="flex gap-3 rounded-xl border border-line bg-surface p-3">
+              <li key={lembrete.id} className="peca flex gap-3 rounded-xl border border-line bg-surface p-3">
                 <span
                   aria-hidden
                   className="mt-1.5 size-2.5 shrink-0 rounded-full"

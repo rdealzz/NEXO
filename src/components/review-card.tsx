@@ -146,11 +146,11 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
       )}
 
       {rows.length > 0 && (
-        <ul className="mt-4 space-y-2">
+        <ul className="entra-em-cascata mt-4 space-y-2">
           {rows.map((row) => (
             <li
               key={row.key}
-              className={`rounded-xl border p-3 transition-colors ${
+              className={`peca rounded-xl border p-3 ${
                 row.selected ? "border-accent/50 bg-accent-soft/40" : "border-line"
               }`}
             >

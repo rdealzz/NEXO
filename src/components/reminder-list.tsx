@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Botao } from "@/components/ui/button";
 import type { Reminder } from "@/lib/db";
 import { CATEGORY_LABEL, daysUntil, humanDate, humanLead, humanRepeat, urgencyColor } from "@/lib/format";
+import { vibrar } from "@/lib/tato";
 
 export type Aba = "hoje" | "proximos" | "caixa";
 
@@ -66,7 +67,7 @@ export function ReminderList({ aba, reminders, onComplete, onSnooze, onSchedule,
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="entra-em-cascata space-y-2">
       {visiveis.map((reminder) => (
         <Item
           key={reminder.id}
@@ -89,20 +90,103 @@ function Item({
   onDelete,
 }: Omit<Props, "aba" | "reminders"> & { reminder: Reminder }) {
   const [aberto, setAberto] = useState(false);
+  const [saindo, setSaindo] = useState(false);
+  const [arrasto, setArrasto] = useState(0);
+  const inicio = useRef<{ x: number; y: number } | null>(null);
   const repete = humanRepeat(reminder.repeat_rule);
 
+  /*
+   * Concluir tem recompensa: o marcador vira um check desenhado, o cartão
+   * encolhe e dissolve, e só então ele sai da lista. Sumir na hora é mais
+   * rápido — e é justamente por isso que não parece que algo foi feito.
+   */
+  function concluir() {
+    if (saindo) return;
+    vibrar("sucesso");
+    setSaindo(true);
+    setTimeout(() => onComplete(reminder.id), 320);
+  }
+
+  /*
+   * O gesto do celular: arrastar para a direita conclui, para a esquerda
+   * adia um dia. O cartão acompanha o dedo, então a pessoa vê o que vai
+   * acontecer antes de soltar — e desistir é só devolver o dedo ao lugar.
+   *
+   * O eixo é decidido no primeiro movimento: se a pessoa está rolando a
+   * página, o cartão não rouba o gesto.
+   */
+  const LIMITE = 96;
+
+  function tocarInicio(evento: React.PointerEvent) {
+    if (evento.pointerType === "mouse") return;
+    inicio.current = { x: evento.clientX, y: evento.clientY };
+  }
+
+  function tocarMove(evento: React.PointerEvent) {
+    if (!inicio.current) return;
+    const dx = evento.clientX - inicio.current.x;
+    const dy = evento.clientY - inicio.current.y;
+    if (Math.abs(dy) > Math.abs(dx)) {
+      inicio.current = null; // É rolagem, não gesto.
+      setArrasto(0);
+      return;
+    }
+    setArrasto(dx);
+  }
+
+  function tocarFim() {
+    if (!inicio.current) return;
+    inicio.current = null;
+    const percorrido = arrasto;
+    setArrasto(0);
+    if (percorrido > LIMITE) concluir();
+    else if (percorrido < -LIMITE) {
+      vibrar("toque");
+      onSnooze(reminder.id, 1440);
+    }
+  }
+
+  const passouDoLimite = Math.abs(arrasto) > LIMITE;
+
   return (
-    <li className="rounded-xl border border-line bg-surface p-3">
+    <li
+      className={`peca relative overflow-hidden rounded-xl border border-line bg-surface p-3 ${
+        saindo ? "dissolvendo" : ""
+      }`}
+      onPointerDown={tocarInicio}
+      onPointerMove={tocarMove}
+      onPointerUp={tocarFim}
+      onPointerCancel={tocarFim}
+      style={{
+        transform: arrasto ? `translate3d(${arrasto}px, 0, 0)` : undefined,
+        transition: arrasto ? "none" : undefined,
+      }}
+    >
+      {/* O que o gesto vai fazer, escrito atrás do cartão enquanto ele desliza. */}
+      {arrasto !== 0 && (
+        <span
+          aria-hidden
+          className={`absolute inset-y-0 flex items-center px-4 text-xs font-semibold ${
+            arrasto > 0 ? "left-0 text-accent" : "right-0 text-muted"
+          } ${passouDoLimite ? "opacity-100" : "opacity-50"}`}
+          style={{ transform: `translate3d(${-arrasto}px, 0, 0)` }}
+        >
+          {arrasto > 0 ? "concluir" : "adiar 1 dia"}
+        </span>
+      )}
+
       <div className="flex items-start gap-3">
         <button
           type="button"
-          onClick={() => onComplete(reminder.id)}
+          onClick={concluir}
           aria-label={`Concluir ${reminder.title}`}
           // `alvo-toque` estica a área clicável para além do desenho no celular:
           // o ponto continua com 20px, mas o dedo acerta uma área de 44px.
-          className="dot3d alvo-toque mt-0.5 size-5 shrink-0 cursor-pointer border-2 transition-colors hover:border-accent"
-          style={{ borderColor: urgencyColor(reminder.due_date) }}
-        />
+          className="dot3d alvo-toque mt-0.5 flex size-5 shrink-0 cursor-pointer items-center justify-center border-2 transition-colors hover:border-accent"
+          style={{ borderColor: saindo ? "var(--accent)" : urgencyColor(reminder.due_date) }}
+        >
+          {saindo && <Check />}
+        </button>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium">{reminder.title}</p>
           <p className="mt-0.5 text-xs text-muted">
@@ -156,6 +240,23 @@ function Item({
         </div>
       </div>
     </li>
+  );
+}
+
+/** O check é desenhado, não aparece: o traço corre em ~200ms. */
+function Check() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-3.5" aria-hidden>
+      <path
+        d="M5 13l4 4L19 7"
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="risca"
+      />
+    </svg>
   );
 }
 

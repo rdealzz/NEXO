@@ -45,6 +45,10 @@ export function HelixChronoMatrix({
 
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isRunning, setIsRunning] = useState(true);
+    // Desenhar 28 anéis por quadro é o trabalho mais caro do app. Ele só se
+    // justifica enquanto a malha está na tela e a aba está à frente — rolar a
+    // página para baixo ou trocar de aba não pode continuar custando quadros.
+    const [visivel, setVisivel] = useState(true);
     const [topology, setTopology] = useState<TopologyMode>('DOUBLE_HELIX');
 
     // O tema vem do app (o atributo data-tema no <html>), não do sistema
@@ -152,6 +156,33 @@ export function HelixChronoMatrix({
         return () => resizeObserver.disconnect();
     }, [initTopology]);
 
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        // Duas condições, guardadas fora do React porque quem as muda são dois
+        // eventos independentes: estar na tela e a aba estar à frente.
+        let naTela = true;
+        const recalcular = () => setVisivel(naTela && !document.hidden);
+
+        const observer = new IntersectionObserver(
+            ([entrada]) => {
+                naTela = entrada.isIntersecting;
+                recalcular();
+            },
+            // Um fio de folga: volta a rodar pouco antes de reaparecer, para a
+            // malha nunca ser vista parada.
+            { rootMargin: '80px' },
+        );
+        observer.observe(container);
+        document.addEventListener('visibilitychange', recalcular);
+
+        return () => {
+            observer.disconnect();
+            document.removeEventListener('visibilitychange', recalcular);
+        };
+    }, []);
+
     // Handle topology transition
     const handleTopologyChange = (newMode: TopologyMode) => {
         if (newMode === topology) return;
@@ -170,6 +201,8 @@ export function HelixChronoMatrix({
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+
+        if (!visivel) return;
 
         let animId = 0;
         let time = 0;
@@ -366,7 +399,7 @@ export function HelixChronoMatrix({
 
         animId = requestAnimationFrame(render);
         return () => cancelAnimationFrame(animId);
-    }, [isRunning, topology, isDarkMode]);
+    }, [isRunning, topology, isDarkMode, visivel]);
 
     const handlePointerMove = (e: React.MouseEvent<HTMLDivElement>) => {
         const container = containerRef.current;

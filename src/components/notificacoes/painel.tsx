@@ -82,7 +82,7 @@ export function PainelNotificacoes({ reminders }: { reminders: Reminder[] }) {
           if (evento.target === dialogo.current) fechar();
         }}
         aria-labelledby="avisos-titulo"
-        className="m-auto w-[min(34rem,calc(100vw-2rem))] rounded-3xl border border-line bg-surface p-6 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+        className="vidro m-auto w-[min(34rem,calc(100vw-2rem))] rounded-3xl border p-6 text-foreground"
       >
         <header className="flex items-start gap-4">
           <div className="min-w-0">

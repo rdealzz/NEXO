@@ -34,6 +34,13 @@
      aparecer através do rosto do botão. */
   --surface-alta: #ececea;
 
+  /* A luz que segue o cursor. No claro ela clareia; no escuro, ver abaixo. */
+  --luz: rgb(255 255 255 / 0.75);
+  --luz-forca: 0.55;
+  /* O vidro das camadas de cima: fundo da página, meio transparente e borrado. */
+  --vidro: rgb(255 255 255 / 0.72);
+  --vidro-borda: rgb(17 17 17 / 0.08);
+
   /* Tokens que os componentes do shadcn/ui esperam, apontados para a paleta do
      NEXO. Sem eles o Calendar renderiza sem cor nenhuma. */
   --primary: var(--accent);
@@ -81,6 +88,13 @@
   --fill-suave: rgb(120 120 128 / 0.26);
   --surface-alta: #1c1c1c;
 
+  /* No preto, a luz do cursor é a única fonte de relevo — por isso ela pesa
+     mais aqui do que no branco, onde o fundo já ilumina sozinho. */
+  --luz: rgb(255 255 255 / 0.5);
+  --luz-forca: 0.75;
+  --vidro: rgb(20 20 20 / 0.72);
+  --vidro-borda: rgb(255 255 255 / 0.1);
+
   --primary: var(--accent);
   --primary-foreground: var(--btn-primary-ink);
   --secondary: var(--accent-soft);
@@ -96,6 +110,55 @@
   --ring: var(--accent);
 
   color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------
+   O sistema de movimento
+   ---------------------------------------------------------------------------
+   Um vocabulário só de física, usado por todas as telas — é o que faz o app
+   parecer um lugar, e não uma coleção de páginas com animações diferentes.
+
+   Nada aqui anima cor de fundo, largura ou posição: só `transform`, `opacity`
+   e `filter`, que o navegador resolve na GPU. É essa disciplina que sustenta
+   os 60 quadros por segundo, não a duração das animações.
+
+   As durações são curtas de propósito. Acima de ~300ms o movimento deixa de
+   ser resposta e vira espera.
+--------------------------------------------------------------------------- */
+:root {
+  --mov-toque: 110ms; /* a resposta ao dedo: precisa ser imperceptível */
+  --mov-rapido: 180ms; /* hover, foco, estados */
+  --mov-medio: 260ms; /* abertura de tela, entrada de card */
+  --mov-longo: 420ms; /* saída de coisa que dissolve */
+
+  /* Desaceleração do iOS: sai rápido, chega devagar. O padrão da casa. */
+  --curva-natural: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Volta com massa: passa um pouco do ponto e assenta. Só para retorno. */
+  --curva-elastica: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --curva-entrada: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/*
+ * Quem pediu menos movimento recebe o app inteiro sem movimento — não uma
+ * versão com "um pouco menos". Zerar aqui, num lugar só, vale mais do que
+ * lembrar da media query em cada componente.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mov-toque: 1ms;
+    --mov-rapido: 1ms;
+    --mov-medio: 1ms;
+    --mov-longo: 1ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @theme inline {
@@ -133,6 +196,158 @@ body {
   /* O NEXO é usado quase todo no celular, então o app respeita a área segura:
      sem isto, o rodapé fica atrás da barra de gestos do iPhone. */
   padding-bottom: env(safe-area-inset-bottom);
+  /* A rolagem não continua no que está atrás quando uma lista chega ao fim. */
+  overscroll-behavior-y: contain;
+}
+
+/* ---------------------------------------------------------------------------
+   Peças vivas
+   ---------------------------------------------------------------------------
+   Uma peça é qualquer coisa que a pessoa pode tocar: botão, cartão, opção de
+   plano. Todas reagem do mesmo jeito, porque pertencem ao mesmo mundo:
+
+   - o cursor traz luz junto (um brilho que nasce onde ele está);
+   - aproximar levanta a peça alguns pixels e aprofunda a sombra;
+   - o clique comprime, e a volta tem elasticidade — massa, não interruptor.
+
+   As coordenadas do cursor chegam em `--luz-x`/`--luz-y` e a inclinação em
+   `--inc-x`/`--inc-y`, escritas por src/components/ui/vivacidade.tsx num
+   ouvinte só, dentro de requestAnimationFrame. Sem cursor (celular), as
+   variáveis não existem e os valores padrão deixam a peça parada — o que é
+   certo: no dedo, quem dá o retorno é o toque, não a luz.
+--------------------------------------------------------------------------- */
+.peca {
+  position: relative;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--mov-rapido) var(--curva-natural),
+    box-shadow var(--mov-rapido) var(--curva-natural);
+}
+
+/* A luz. Fica numa camada própria para o brilho não mexer no texto. */
+.peca::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    18rem circle at var(--luz-x, 50%) var(--luz-y, 50%),
+    var(--luz),
+    transparent 55%
+  );
+  transition: opacity var(--mov-rapido) var(--curva-entrada);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .peca:hover::after {
+    opacity: var(--luz-forca);
+  }
+
+  .peca:hover {
+    transform: perspective(50rem) translate3d(0, -2px, 0) rotateX(var(--inc-y, 0deg))
+      rotateY(var(--inc-x, 0deg));
+  }
+}
+
+/* O conteúdo fica acima da luz. */
+.peca > * {
+  position: relative;
+  z-index: 1;
+}
+
+.peca:active {
+  transform: translate3d(0, 1px, 0) scale(0.985);
+  transition-duration: var(--mov-toque);
+}
+
+/* ---------------------------------------------------------------------------
+   Nascer, entrar e dissolver
+   ---------------------------------------------------------------------------
+   Três movimentos, e o app inteiro usa só estes:
+
+   - `nascer`: a tela chegando (src/components/ui/cena.tsx);
+   - `surgir`: um item entrando numa lista, com um atraso curto entre eles;
+   - `dissolver`: algo saindo — nunca sumindo de uma vez.
+
+   O desfoque entra por 260ms num elemento de página inteira e sai; é o único
+   lugar do app onde ele aparece, porque `filter` é caro e não pode virar
+   hábito.
+--------------------------------------------------------------------------- */
+@keyframes nascer {
+  from {
+    opacity: 0;
+    transform: scale(0.99) translate3d(0, 8px, 0);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dissolver {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+.cena {
+  animation: nascer var(--mov-medio) var(--curva-natural) both;
+}
+
+/*
+ * A cascata da lista. O atraso é por posição e para no oitavo item: numa lista
+ * longa, esperar o vigésimo item aparecer deixa de ser elegante e vira lentidão.
+ */
+.entra-em-cascata > * {
+  animation: surgir var(--mov-medio) var(--curva-natural) both;
+}
+
+.entra-em-cascata > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.entra-em-cascata > *:nth-child(2) {
+  animation-delay: 35ms;
+}
+.entra-em-cascata > *:nth-child(3) {
+  animation-delay: 70ms;
+}
+.entra-em-cascata > *:nth-child(4) {
+  animation-delay: 105ms;
+}
+.entra-em-cascata > *:nth-child(5) {
+  animation-delay: 140ms;
+}
+.entra-em-cascata > *:nth-child(6) {
+  animation-delay: 175ms;
+}
+.entra-em-cascata > *:nth-child(7) {
+  animation-delay: 210ms;
+}
+.entra-em-cascata > *:nth-child(n + 8) {
+  animation-delay: 240ms;
+}
+
+/* Saindo de cena: encolhe e some, em vez de desaparecer no meio da lista. */
+.dissolvendo {
+  animation: dissolver var(--mov-rapido) var(--curva-entrada) both;
+  pointer-events: none;
 }
 
 /* Texto legal: medida curta e linha alta, para ser lido de verdade. */
@@ -200,11 +415,22 @@ body {
 
    Uso: className="btn btn--primary" (ver src/components/ui/button.tsx).
 --------------------------------------------------------------------------- */
+/*
+ * A força da luz precisa ser um número animável, e propriedade custom só anima
+ * depois de declarada. Sem isto o brilho apareceria de uma vez, em degrau.
+ */
+@property --luz-op {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 .btn {
   --btn-face: var(--fill-suave);
   --btn-ink: var(--foreground);
   /* Altura da peça. É esta medida que o :active devolve ao fundo. */
   --btn-altura: 3px;
+  --luz-op: 0;
 
   position: relative;
   display: inline-flex;
@@ -220,11 +446,15 @@ body {
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--btn-ink);
-  background-image: linear-gradient(
-    to bottom,
-    rgb(255 255 255 / 0.06),
-    rgb(0 0 0 / 0.06)
-  );
+  /* Duas camadas de luz: a fixa, que dá o volume da peça, e a que segue o
+     cursor. A segunda vive em `--luz-op`, que sobe no hover. */
+  background-image:
+    radial-gradient(
+      14rem circle at var(--luz-x, 50%) var(--luz-y, 50%),
+      rgb(255 255 255 / calc(0.55 * var(--luz-op))),
+      transparent 60%
+    ),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.06), rgb(0 0 0 / 0.06));
   background-color: var(--btn-face);
   box-shadow:
     inset 0 1px 0 var(--btn-gloss),
@@ -237,25 +467,38 @@ body {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  /* A volta é elástica: a peça passa um pouco do ponto e assenta, como algo
+     que tem massa. A ida (o :active, abaixo) é curta e seca — o dedo não
+     espera. */
   transition:
-    transform 120ms cubic-bezier(0.32, 0.72, 0, 1),
-    box-shadow 120ms cubic-bezier(0.32, 0.72, 0, 1),
-    filter 120ms ease;
+    transform var(--mov-rapido) var(--curva-elastica),
+    box-shadow var(--mov-rapido) var(--curva-natural),
+    --luz-op var(--mov-rapido) var(--curva-entrada);
 }
 
-.btn:hover:not(:disabled):not([aria-disabled="true"]) {
-  filter: brightness(1.06);
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled):not([aria-disabled="true"]) {
+    --luz-op: 1;
+    /* Sobe 1px e a sombra afunda junto: a peça se aproxima da pessoa. */
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 var(--btn-gloss),
+      inset 0 -1px 0 var(--btn-shade),
+      0 calc(var(--btn-altura) + 1px) 0 -1px color-mix(in oklab, var(--btn-face) 62%, #000),
+      0 calc(var(--btn-altura) + 6px) 14px -3px var(--btn-cast);
+  }
 }
 
 /* O toque afunda a peça até o fundo: ela desce, e a base some junto. */
 .btn:active:not(:disabled):not([aria-disabled="true"]) {
-  transform: translateY(var(--btn-altura));
+  transform: translateY(var(--btn-altura)) scale(0.99);
   box-shadow:
     inset 0 1px 0 var(--btn-shade),
     inset 0 -1px 0 var(--btn-gloss),
     0 0 0 -1px color-mix(in oklab, var(--btn-face) 62%, #000),
     0 1px 2px 0 var(--btn-cast);
-  filter: brightness(0.98);
+  transition-duration: var(--mov-toque);
+  transition-timing-function: var(--curva-natural);
 }
 
 .btn:focus-visible {
@@ -317,7 +560,6 @@ body {
 
 .btn--ghost:hover:not(:disabled) {
   --btn-face: var(--fill-suave);
-  filter: none;
 }
 
 /* --- Tamanhos ----------------------------------------------------------- */
@@ -356,16 +598,6 @@ body {
   width: 100%;
 }
 
-/* Quem pediu menos movimento continua vendo o relevo, mas sem o salto. */
-@media (prefers-reduced-motion: reduce) {
-  .btn {
-    transition: none;
-  }
-  .btn:active:not(:disabled) {
-    transform: none;
-  }
-}
-
 /* O marcador redondo de "concluir" acompanha o mesmo toque. */
 .dot3d {
   border-radius: 9999px;
@@ -375,8 +607,8 @@ body {
     0 2px 0 -1px color-mix(in oklab, var(--border) 80%, #000),
     0 4px 6px -3px var(--btn-cast);
   transition:
-    transform 120ms cubic-bezier(0.32, 0.72, 0, 1),
-    box-shadow 120ms cubic-bezier(0.32, 0.72, 0, 1);
+    transform var(--mov-rapido) var(--curva-elastica),
+    box-shadow var(--mov-rapido) var(--curva-natural);
 }
 
 .dot3d:active {
@@ -412,6 +644,210 @@ body {
 
 .dia-com-lembrete[data-selected="true"] button::after {
   background: var(--primary-foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   Espera que comunica
+   ---------------------------------------------------------------------------
+   Nenhum spinner no app. Enquanto o NEXO lê o que a pessoa mandou, o que
+   aparece é o esqueleto do resultado com uma luz atravessando — a forma da
+   resposta já está lá, só falta o conteúdo. E o ponto ao lado do título
+   respira, no ritmo de quem está trabalhando, não de quem travou.
+--------------------------------------------------------------------------- */
+@keyframes atravessa {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes respirar {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.bloco-esperando {
+  position: relative;
+  overflow: hidden;
+  background: var(--fill-suave);
+}
+
+.bloco-esperando::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--luz), transparent);
+  /* Translada, não muda `background-position`: fica na GPU. */
+  animation: atravessa 1.4s var(--curva-entrada) infinite;
+}
+
+.respira {
+  animation: respirar 1.6s ease-in-out infinite;
+}
+
+/*
+ * As etapas da leitura. As três frases ficam empilhadas na mesma célula e se
+ * revezam na opacidade — `content` não é animável de forma confiável, e um
+ * timer em JS custaria um render por troca só para mudar três palavras.
+ */
+@keyframes revezar {
+  0%,
+  22% {
+    opacity: 1;
+  }
+  30%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.etapas {
+  display: inline-grid;
+}
+
+.etapas > span {
+  grid-area: 1 / 1;
+  opacity: 0;
+  animation: revezar 6s var(--curva-entrada) infinite;
+}
+
+.etapas > span:nth-child(2) {
+  animation-delay: 2s;
+}
+
+.etapas > span:nth-child(3) {
+  animation-delay: 4s;
+}
+
+/*
+ * O check de concluir é desenhado, não colado: o traço corre do começo ao fim
+ * em 200ms. É meio segundo de recompensa por uma coisa que a pessoa terminou —
+ * e é a diferença entre "sumiu" e "eu fiz".
+ */
+@keyframes riscar {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.risca {
+  stroke-dasharray: 24;
+  animation: riscar 200ms var(--curva-natural) both;
+}
+
+/* ---------------------------------------------------------------------------
+   O campo
+   ---------------------------------------------------------------------------
+   É o elemento mais importante do NEXO: tudo entra por ele. Por isso ele
+   responde a três coisas.
+
+   Foco: cresce um fio, a borda deixa de ser tracejada e ganha um halo. A
+   pessoa vê que o app está ouvindo.
+
+   Leitura: enquanto a IA trabalha, uma luz dá a volta na borda. Não é um
+   spinner colado num canto — é o próprio campo processando o que recebeu.
+
+   A luz é um cônico girando atrás de uma máscara, então gira em `transform`:
+   uma camada, sem repintar a borda a cada quadro.
+--------------------------------------------------------------------------- */
+.campo-vivo {
+  position: relative;
+  transition:
+    transform var(--mov-rapido) var(--curva-natural),
+    border-color var(--mov-rapido) var(--curva-entrada),
+    box-shadow var(--mov-rapido) var(--curva-entrada);
+}
+
+.campo-vivo:focus-within {
+  transform: scale(1.006);
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+@keyframes varrer {
+  from {
+    transform: translate3d(0, -110%, 0);
+  }
+  to {
+    transform: translate3d(0, 110%, 0);
+  }
+}
+
+/*
+ * Lendo: uma linha de luz varre o campo de cima a baixo, como um scanner
+ * passando pelo que a pessoa acabou de mandar.
+ *
+ * É uma faixa dentro de uma caixa com `overflow: hidden`, movida por
+ * `transform`: não tem como escapar do campo e não custa repintura. Uma versão
+ * anterior desenhava um anel na borda com gradiente cônico e máscara — bonito
+ * no papel, mas o recorte escapava e sobrava um risco verde atravessando a
+ * página.
+ */
+.campo-vivo--lendo {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  border-style: solid;
+}
+
+.campo-vivo--lendo::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 45%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklab, var(--accent) 16%, transparent),
+    transparent
+  );
+  animation: varrer 1.5s var(--curva-entrada) infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Vidro
+   ---------------------------------------------------------------------------
+   Só as camadas que ficam por cima de outra coisa usam vidro: diálogo, menu do
+   retrato, barra de cookies. É o que dá a noção de que existe conteúdo atrás —
+   e é por isso que ele não aparece em cartão comum, onde não há nada atrás para
+   deixar transparecer.
+
+   `backdrop-filter` é caro: cada superfície custa um borrão de tela inteira por
+   quadro. Por isso são poucas, pequenas e nunca animadas.
+--------------------------------------------------------------------------- */
+.vidro {
+  background: var(--vidro);
+  border-color: var(--vidro-borda);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* O fundo escurece e desfoca junto: o que está atrás continua ali, só recua. */
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: surgir var(--mov-rapido) var(--curva-entrada) both;
+}
+
+dialog[open] {
+  animation: nascer var(--mov-medio) var(--curva-natural) both;
 }
 
 /* ---------------------------------------------------------------------------

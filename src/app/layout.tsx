@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 
 import { Abertura } from "@/components/abertura/abertura";
 import { BannerCookies } from "@/components/legal/banner-cookies";
+import { Cena } from "@/components/ui/cena";
+import { Vivacidade } from "@/components/ui/vivacidade";
 import { SCRIPT_DO_TEMA } from "@/lib/tema";
 
 import "./globals.css";
@@ -40,7 +42,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_DO_TEMA }} />
         <Abertura />
-        {children}
+        <Vivacidade />
+        <Cena>{children}</Cena>
         <BannerCookies />
       </body>
     </html>

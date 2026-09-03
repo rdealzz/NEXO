@@ -64,7 +64,7 @@ export default function Home() {
       <div className="mx-auto w-full max-w-2xl px-5 pb-16">
         <section className="mt-12 sm:mt-16">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">O que ele faz</h2>
-          <ul className="mt-3 divide-y divide-line overflow-hidden rounded-2xl border border-line">
+          <ul className="entra-em-cascata mt-3 divide-y divide-line overflow-hidden rounded-2xl border border-line">
             {EXEMPLOS.map((exemplo) => (
               <li key={exemplo.entrada} className="grid gap-1 p-4 sm:grid-cols-2 sm:gap-4">
                 <p className="text-sm text-muted">{exemplo.entrada}</p>
@@ -80,11 +80,11 @@ export default function Home() {
 
         <section className="mt-12">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">Quanto custa</h2>
-          <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+          <ul className="entra-em-cascata mt-3 grid gap-3 sm:grid-cols-3">
             {PLANOS.map((plano) => {
               const ganho = economia(plano);
               return (
-                <li key={plano.id} className="rounded-2xl border border-line p-4">
+                <li key={plano.id} className="peca rounded-2xl border border-line p-4">
                   <p className="text-sm font-semibold">{plano.nome}</p>
                   <p className="mt-1 flex items-baseline gap-1">
                     <span className="text-2xl font-semibold tracking-tight">{brl(precoPorMes(plano))}</span>

@@ -6,9 +6,11 @@ import { DropArea, type CapturePayload } from "@/components/drop-area";
 import { ReminderList, type Aba } from "@/components/reminder-list";
 import { ReviewCard, type ConfirmedDraft } from "@/components/review-card";
 import { Botao } from "@/components/ui/button";
+import { Pensando } from "@/components/ui/pensando";
 import type { Reminder } from "@/lib/db";
 import { daysUntil } from "@/lib/format";
 import type { FollowUp } from "@/lib/nexo/rules";
+import { vibrar } from "@/lib/tato";
 import type { CaptureAnalysis } from "@/lib/nexo/schema";
 
 type Draft = { captureId: string; analysis: CaptureAnalysis; followUps: FollowUp[] };
@@ -73,6 +75,7 @@ export function InboxClient({ initialReminders }: { initialReminders: Reminder[]
       if (!response.ok) throw new Error(body.error ?? "Não consegui salvar.");
 
       const criados = body.reminders as Reminder[];
+      vibrar("sucesso");
       setReminders((current) => [...current, ...criados]);
       setDraft(null);
       // Leva a pessoa para onde a coisa caiu, senão parece que sumiu.
@@ -126,6 +129,8 @@ export function InboxClient({ initialReminders }: { initialReminders: Reminder[]
           {error}
         </p>
       )}
+
+      {busy && !draft && <Pensando />}
 
       {draft && (
         <ReviewCard

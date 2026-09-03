@@ -38,7 +38,7 @@ export function ModalPermissao({ permissao, modo, onAceitar, onFechar }: Props) 
         if (evento.target === dialogo.current) dialogo.current?.close();
       }}
       aria-labelledby="permissao-titulo"
-      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-3xl border border-line bg-surface p-6 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+      className="vidro m-auto w-[min(28rem,calc(100vw-2rem))] rounded-3xl border p-6 text-foreground"
     >
       <div className="flex size-12 items-center justify-center rounded-2xl bg-accent-soft text-accent">
         {permissao === "camera" ? <IconeCamera /> : <IconeGaleria />}

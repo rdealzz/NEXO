@@ -66,7 +66,7 @@ export function BannerCookies() {
       aria-label="Aviso de cookies"
       // Barra fixa no rodapé: no iPhone ela ficaria embaixo da barra de gestos,
       // então o padding de baixo soma a área segura ao espaçamento normal.
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.25)]"
+      className="vidro fixed inset-x-0 bottom-0 z-40 border-t p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.25)]"
     >
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 sm:flex-row sm:items-center">
         <p className="flex-1 text-sm leading-snug">
