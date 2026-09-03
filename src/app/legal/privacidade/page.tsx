@@ -6,7 +6,7 @@ import { ATUALIZADO_EM, EMAIL_CONTATO } from "@/lib/legal";
 export const metadata: Metadata = {
   title: "Política de Privacidade — NEXO",
   description:
-    "O que o NEXO coleta, por que coleta, com quem compartilha e como você apaga tudo. Seus dados não treinam nenhuma IA.",
+    "O que o NEXO coleta, por que coleta, com quem compartilha e como você apaga tudo — incluindo o que o provedor de IA pode fazer com o material que você manda.",
 };
 
 export default function PrivacidadePage() {
@@ -23,10 +23,19 @@ export default function PrivacidadePage() {
 
       <div className="destaque">
         <p>
-          <strong>Seus dados pessoais não treinam nenhuma inteligência artificial.</strong> O conteúdo que você
-          manda é enviado ao provedor do modelo apenas para ser lido naquele momento, e volta como o lembrete que
-          você vê na tela. Pelo contrato de uso da API, esse conteúdo não é usado para treinar nem melhorar
-          modelos, nossos ou de terceiros. Também não vendemos, alugamos nem cedemos seus dados para publicidade.
+          <strong>O material que você manda passa pelo Google para ser lido.</strong> O NEXO usa o Gemini, do
+          Google, para interpretar cada captura: a foto, o PDF ou o texto vai até lá, é lido, e volta como o
+          lembrete que você vê na tela.
+        </p>
+        <p className="mt-3">
+          Hoje o NEXO usa o <strong>nível gratuito</strong> dessa API, e nele o Google pode usar o conteúdo
+          enviado para melhorar os produtos e modelos dele. Não temos como impedir isso sem migrar para o nível
+          pago — e enquanto essa migração não acontecer, preferimos escrever aqui em vez de deixar você supor o
+          contrário. <strong>Não mande pelo NEXO o que você não mandaria para o Google.</strong>
+        </p>
+        <p className="mt-3">
+          O que continua valendo: nós não vendemos, não alugamos e não cedemos seus dados para publicidade, e não
+          treinamos modelo nenhum com eles. Seus arquivos ficam em bucket privado, e apagar a conta apaga tudo.
         </p>
       </div>
 

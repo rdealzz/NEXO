@@ -56,7 +56,7 @@ Duas decisões sustentam isso:
 
 ```bash
 npm install
-cp .env.example .env.local   # e preencha ANTHROPIC_API_KEY
+cp .env.example .env.local   # e preencha GEMINI_API_KEY
 npm run dev                  # http://localhost:3000
 ```
 

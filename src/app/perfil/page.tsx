@@ -169,7 +169,7 @@ export default async function PerfilPage() {
                     </Link>
                   </div>
                   <p className="mt-3 rounded-xl bg-accent-soft px-3 py-2 text-xs leading-snug text-accent">
-                    Seus dados pessoais não treinam nenhuma inteligência artificial.
+                    O que você manda é lido pelo Gemini, do Google, para virar lembrete. Veja a política.
                   </p>
                 </Secao>
 

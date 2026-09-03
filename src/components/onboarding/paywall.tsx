@@ -8,7 +8,7 @@ const INCLUI = [
   "Avisos com a antecedência que você quiser — de 10 minutos a 30 dias antes",
   "Lembretes proativos: revisão, filtro, licenciamento, fim de garantia",
   "Entrada por WhatsApp e por e-mail, sem abrir o app",
-  "Seus documentos em bucket privado. Seus dados não treinam nenhuma IA",
+  "Seus documentos em bucket privado. Nós não vendemos nem cedemos seus dados",
 ];
 
 /**

@@ -15,7 +15,12 @@ export function RodapeLegal({ className = "" }: { className?: string }) {
           Sua conta e seus dados
         </Link>
       </nav>
-      <p className="mt-3 text-xs">Seus dados pessoais não treinam nenhuma inteligência artificial.</p>
+      <p className="mt-3 text-xs">
+        O que você manda é lido pelo Gemini, do Google, para virar lembrete.{" "}
+        <Link href="/legal/privacidade" className="underline underline-offset-2">
+          Como isso funciona
+        </Link>
+      </p>
     </footer>
   );
 }

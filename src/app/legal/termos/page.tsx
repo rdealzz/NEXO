@@ -60,6 +60,13 @@ export default function TermosPage() {
         modelos de inteligência artificial.
       </p>
       <p>
+        Processar o material significa enviá-lo ao Gemini, do Google, que é quem faz a leitura. O NEXO usa hoje o
+        nível gratuito dessa API, e nele o Google pode usar o conteúdo para melhorar os produtos dele. Nós não
+        treinamos nada com o seu conteúdo, mas não controlamos o que o provedor faz sob os termos dele — e é por
+        isso que dizemos, em vez de deixar implícito. A{" "}
+        <Link href="/legal/privacidade">Política de Privacidade</Link> detalha isso.
+      </p>
+      <p>
         Em troca, você se compromete a mandar apenas material que seja seu ou que você tenha o direito de enviar,
         e a não usar o NEXO para nada ilícito.
       </p>

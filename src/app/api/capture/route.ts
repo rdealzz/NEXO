@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
   if (!isConfigured()) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY não configurada. Veja o README para rodar localmente." },
+      { error: "GEMINI_API_KEY não configurada. Veja o README para rodar localmente." },
       { status: 503 },
     );
   }
