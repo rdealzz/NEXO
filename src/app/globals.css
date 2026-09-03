@@ -26,10 +26,13 @@
   /* Relevo dos botões 3D: brilho de cima, sombra de baixo, sombra projetada. */
   --btn-gloss: rgb(255 255 255 / 0.55);
   --btn-shade: rgb(0 0 0 / 0.1);
-  --btn-cast: rgb(22 21 15 / 0.2);
+  --btn-cast: rgb(17 17 17 / 0.22);
   --btn-primary-ink: #ffffff;
   /* O cinza de preenchimento do iOS: quase neutro, quase transparente. */
   --fill-suave: rgb(120 120 128 / 0.14);
+  /* A versão opaca dele, para peças com relevo: translúcido deixaria a base 3D
+     aparecer através do rosto do botão. */
+  --surface-alta: #ececea;
 
   /* Tokens que os componentes do shadcn/ui esperam, apontados para a paleta do
      NEXO. Sem eles o Calendar renderiza sem cor nenhuma. */
@@ -71,11 +74,12 @@
   --danger: #ff6b5c;
   --warning: #f0b83c;
 
-  --btn-gloss: rgb(255 255 255 / 0.1);
-  --btn-shade: rgb(0 0 0 / 0.35);
-  --btn-cast: rgb(0 0 0 / 0.55);
+  --btn-gloss: rgb(255 255 255 / 0.14);
+  --btn-shade: rgb(0 0 0 / 0.4);
+  --btn-cast: rgb(0 0 0 / 0.7);
   --btn-primary-ink: #06231a;
   --fill-suave: rgb(120 120 128 / 0.26);
+  --surface-alta: #1c1c1c;
 
   --primary: var(--accent);
   --primary-foreground: var(--btn-primary-ink);
@@ -178,16 +182,26 @@ body {
 /* ---------------------------------------------------------------------------
    Botões
    ---------------------------------------------------------------------------
-   Padrão Apple: retângulo de cantos generosos, preenchimento sólido, sem borda
-   nem relevo. O toque não empurra uma peça para baixo — ele encolhe o botão de
-   leve e clareia, que é a resposta que o iOS dá. Todo o peso visual vem da cor,
-   não de sombra.
+   Peça física, não retângulo pintado. O relevo vem de quatro camadas, na ordem
+   em que a luz cai numa superfície real:
+
+   1. um brilho fino na borda de cima (inset, claro) — onde a luz bate;
+   2. uma sombra fina na borda de baixo (inset, escura) — a espessura da peça;
+   3. a base sólida sob o botão, que é o que dá altura;
+   4. a sombra projetada no fundo, que separa a peça da página.
+
+   O gradiente do rosto é sutil de propósito: 6% de claro em cima para 6% de
+   escuro embaixo. Muito mais que isso vira plástico dos anos 2000; muito menos
+   e a peça achata. O toque afunda de verdade — o botão desce a própria altura e
+   a base encolhe junto, então o dedo sente que empurrou algo.
 
    Uso: className="btn btn--primary" (ver src/components/ui/button.tsx).
 --------------------------------------------------------------------------- */
 .btn {
   --btn-face: var(--fill-suave);
   --btn-ink: var(--foreground);
+  /* Altura da peça. É esta medida que o :active devolve ao fundo. */
+  --btn-altura: 3px;
 
   position: relative;
   display: inline-flex;
@@ -195,15 +209,25 @@ body {
   justify-content: center;
   gap: 0.5rem;
   border: 0;
-  border-radius: 0.75rem;
+  border-radius: 0.85rem;
   padding: 0.68rem 1.15rem;
   font: inherit;
   font-size: 0.9375rem;
-  font-weight: 590;
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--btn-ink);
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.06),
+    rgb(0 0 0 / 0.06)
+  );
   background-color: var(--btn-face);
+  box-shadow:
+    inset 0 1px 0 var(--btn-gloss),
+    inset 0 -1px 0 var(--btn-shade),
+    0 var(--btn-altura) 0 -1px color-mix(in oklab, var(--btn-face) 62%, #000),
+    0 calc(var(--btn-altura) + 3px) 8px -2px var(--btn-cast);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
@@ -211,34 +235,40 @@ body {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   transition:
-    transform 140ms cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 140ms ease,
-    background-color 140ms ease;
+    transform 120ms cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 120ms cubic-bezier(0.32, 0.72, 0, 1),
+    filter 120ms ease;
 }
 
 .btn:hover:not(:disabled):not([aria-disabled="true"]) {
-  opacity: 0.88;
+  filter: brightness(1.06);
 }
 
-/* O toque afunda pelo tamanho, não pela sombra. */
+/* O toque afunda a peça até o fundo: ela desce, e a base some junto. */
 .btn:active:not(:disabled):not([aria-disabled="true"]) {
-  transform: scale(0.96);
-  opacity: 0.8;
+  transform: translateY(var(--btn-altura));
+  box-shadow:
+    inset 0 1px 0 var(--btn-shade),
+    inset 0 -1px 0 var(--btn-gloss),
+    0 0 0 -1px color-mix(in oklab, var(--btn-face) 62%, #000),
+    0 1px 2px 0 var(--btn-cast);
+  filter: brightness(0.98);
 }
 
 .btn:focus-visible {
   outline: 3px solid color-mix(in oklab, var(--accent) 45%, transparent);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .btn:disabled,
 .btn[aria-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.35;
+  opacity: 0.4;
   transform: none;
+  box-shadow: inset 0 1px 0 var(--btn-gloss);
 }
 
-/* Interruptor ligado. */
+/* Interruptor ligado: fica afundado, como tecla presa. */
 .btn[aria-pressed="true"],
 .btn[data-ativo="true"] {
   --btn-face: var(--accent);
@@ -252,7 +282,9 @@ body {
 }
 
 .btn--surface {
-  --btn-face: var(--fill-suave);
+  /* O secundário precisa de rosto opaco: sobre o cinza translúcido do iOS a
+     base 3D apareceria através da peça. */
+  --btn-face: var(--surface-alta);
   --btn-ink: var(--foreground);
 }
 
@@ -266,41 +298,52 @@ body {
   --btn-ink: #ffffff;
 }
 
-/* Botão de texto do iOS: sem fundo, a cor faz o trabalho. */
+/* Botão de texto: sem peça, sem relevo — a cor faz o trabalho. */
 .btn--ghost {
   --btn-face: transparent;
   --btn-ink: var(--accent);
   font-weight: 500;
+  background-image: none;
+  box-shadow: none;
+}
+
+.btn--ghost:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: none;
 }
 
 .btn--ghost:hover:not(:disabled) {
   --btn-face: var(--fill-suave);
-  opacity: 1;
+  filter: none;
 }
 
 /* --- Tamanhos ----------------------------------------------------------- */
 .btn--lg {
-  border-radius: 0.875rem;
+  --btn-altura: 4px;
+  border-radius: 1rem;
   padding: 0.95rem 1.6rem;
   font-size: 1.0625rem;
 }
 
 .btn--sm {
-  border-radius: 0.625rem;
+  --btn-altura: 2px;
+  border-radius: 0.7rem;
   padding: 0.45rem 0.85rem;
   font-size: 0.875rem;
 }
 
 .btn--chip {
+  --btn-altura: 2px;
   border-radius: 999px;
-  padding: 0.3rem 0.75rem;
+  padding: 0.35rem 0.8rem;
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 550;
 }
 
 .btn--icon {
-  width: 2.25rem;
-  height: 2.25rem;
+  --btn-altura: 2px;
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
   border-radius: 999px;
 }
@@ -310,6 +353,7 @@ body {
   width: 100%;
 }
 
+/* Quem pediu menos movimento continua vendo o relevo, mas sem o salto. */
 @media (prefers-reduced-motion: reduce) {
   .btn {
     transition: none;
@@ -323,11 +367,20 @@ body {
 .dot3d {
   border-radius: 9999px;
   background: var(--surface);
-  transition: transform 140ms cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow:
+    inset 0 1px 0 var(--btn-gloss),
+    0 2px 0 -1px color-mix(in oklab, var(--border) 80%, #000),
+    0 4px 6px -3px var(--btn-cast);
+  transition:
+    transform 120ms cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 120ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .dot3d:active {
-  transform: scale(0.9);
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 2px var(--btn-shade),
+    0 1px 1px -1px var(--btn-cast);
 }
 
 /* ---------------------------------------------------------------------------
@@ -356,15 +409,4 @@ body {
 
 .dia-com-lembrete[data-selected="true"] button::after {
   background: var(--primary-foreground);
-}
-
-/* Quem pediu menos movimento continua vendo o relevo, mas sem o salto. */
-@media (prefers-reduced-motion: reduce) {
-  .btn {
-    transition: none;
-  }
-  .btn:hover:not(:disabled),
-  .dot3d:hover {
-    transform: none;
-  }
 }

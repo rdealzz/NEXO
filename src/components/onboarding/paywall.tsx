@@ -1,6 +1,6 @@
-import { BotaoAssinar } from "@/components/assinatura/botao-assinar";
+import { Planos } from "@/components/assinatura/planos";
 import { BotaoLink } from "@/components/ui/button";
-import { brl, brlRedondo, PLANO, PRECO_ANUAL } from "@/lib/pricing";
+import { PRECO_ANUAL, TESTE_DIAS } from "@/lib/pricing";
 
 const INCLUI = [
   "Captura ilimitada: foto, print, PDF, áudio, e-mail encaminhado ou texto",
@@ -26,18 +26,16 @@ export function Paywall({ economia, autenticado = false }: { economia: number; a
         </p>
       )}
 
-      <h2 className="text-2xl font-semibold tracking-tight">Um plano. Sem pegadinha.</h2>
-
-      <p className="mt-4 flex items-baseline gap-2">
-        <span className="text-5xl font-semibold tracking-tight">{brl(PLANO.precoMensal)}</span>
-        <span className="text-muted">/mês</span>
-      </p>
+      <h2 className="text-2xl font-semibold tracking-tight">Escolha o prazo. O serviço é o mesmo.</h2>
       <p className="mt-1 text-sm text-muted">
-        {brlRedondo(PRECO_ANUAL)} por ano — menos que {paga ? "um" : "uma"}{" "}
-        {paga ? "único esquecimento da lista anterior" : "consulta perdida"}. Cancele quando quiser, sem fidelidade.
+        Quanto maior o prazo, mais barato sai o mês. Sem fidelidade em nenhum deles.
       </p>
 
-      <ul className="mt-6 space-y-2.5">
+      <div className="mt-5">
+        <Planos autenticado={autenticado} />
+      </div>
+
+      <ul className="mt-7 space-y-2.5">
         {INCLUI.map((item) => (
           <li key={item} className="flex gap-2.5 text-sm leading-snug">
             <span aria-hidden className="mt-0.5 shrink-0 font-semibold text-accent">
@@ -48,16 +46,11 @@ export function Paywall({ economia, autenticado = false }: { economia: number; a
         ))}
       </ul>
 
-      <div className="mt-7 space-y-3">
-        <BotaoAssinar autenticado={autenticado} />
+      <div className="mt-7">
         <BotaoLink href="/inbox" variant="ghost" block>
-          Quero testar antes de assinar
+          Testar {TESTE_DIAS} dias grátis antes de assinar
         </BotaoLink>
       </div>
-
-      <p className="mt-4 text-center text-xs text-muted">
-        Pix, boleto ou cartão. Renova todo mês, e o cancelamento é um clique dentro do app.
-      </p>
     </section>
   );
 }

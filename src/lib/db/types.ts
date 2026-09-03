@@ -135,6 +135,8 @@ export type Subscription = {
   customer_id: string | null;
   subscription_id: string | null;
   status: StatusAssinatura;
+  /** Qual plano foi contratado (ver src/lib/pricing.ts). Define o vencimento. */
+  plan_id: string | null;
   valid_until: string | null;
   /** O que dá para mostrar de um cartão sem guardar cartão nenhum. */
   card_brand: string | null;

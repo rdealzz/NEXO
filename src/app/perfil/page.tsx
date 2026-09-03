@@ -34,7 +34,7 @@ export default async function PerfilPage() {
   if (!user) redirect("/entrar");
 
   const perfil = await ensureProfile(user.id, user.email);
-  const acesso = await acessoDe(user.id);
+  const acesso = await acessoDe(user.id, perfil.created_at, user.email);
   const assinatura = await store().getSubscription(user.id);
   const endereco = inboundAddress(perfil);
 
@@ -76,7 +76,7 @@ export default async function PerfilPage() {
             conteudo: (
               <>
                 <Secao titulo="Plano atual">
-                  <PlanoAtual acesso={acesso} />
+                  <PlanoAtual acesso={acesso} planoId={assinatura?.plan_id} />
                 </Secao>
                 <Secao
                   titulo="Assinatura"

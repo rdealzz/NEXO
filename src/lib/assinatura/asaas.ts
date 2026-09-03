@@ -1,4 +1,4 @@
-import { PLANO } from "@/lib/pricing";
+import { PLANO_PADRAO, type Plano } from "@/lib/pricing";
 
 /**
  * Cliente do Asaas.
@@ -60,7 +60,10 @@ export type AssinaturaAsaas = {
   invoiceUrl?: string;
 };
 
-export async function criarAssinatura(customerId: string): Promise<AssinaturaAsaas> {
+export async function criarAssinatura(
+  customerId: string,
+  plano: Plano = PLANO_PADRAO,
+): Promise<AssinaturaAsaas> {
   const assinatura = await chamar<AssinaturaAsaas>("/subscriptions", {
     method: "POST",
     body: JSON.stringify({
@@ -68,10 +71,12 @@ export async function criarAssinatura(customerId: string): Promise<AssinaturaAsa
       // UNDEFINED deixa a pessoa escolher entre Pix, boleto e cartão na tela
       // de pagamento — é o que evita perder quem não tem cartão.
       billingType: "UNDEFINED",
-      value: PLANO.precoMensal,
+      value: plano.preco,
       nextDueDate: hoje(),
-      cycle: "MONTHLY",
-      description: `${PLANO.nome} — assinatura mensal`,
+      // O ciclo do gateway é o mesmo do plano: quem paga um ano só é cobrado de
+      // novo daqui a um ano.
+      cycle: plano.ciclo,
+      description: `NEXO — plano ${plano.nome.toLowerCase()}`,
     }),
   });
 

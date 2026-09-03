@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { INICIO_COOKIE } from "@/lib/cookies-nomes";
+
 /**
  * Renova a sessão do Supabase a cada navegação. Server Components não podem
  * escrever cookies, então é aqui que o token atualizado é gravado — sem isto,
@@ -8,6 +10,19 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
+
+  // O relógio do teste grátis começa na primeira visita, e é aqui que ele é
+  // carimbado: Server Component não escreve cookie, e sem uma data gravada o
+  // teste recomeçaria a cada navegação — teste eterno para todo mundo.
+  if (!request.cookies.get(INICIO_COOKIE)) {
+    response.cookies.set(INICIO_COOKIE, new Date().toISOString(), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 365,
+      path: "/",
+    });
+  }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

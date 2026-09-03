@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { acessoDoDono, deveTravar } from "@/lib/assinatura/porta";
 import { isConfigured, UnsupportedFileError } from "@/lib/nexo/extract";
 import { ingest } from "@/lib/nexo/ingest";
 import { CaptureKindSchema, type CaptureKind } from "@/lib/nexo/schema";
@@ -13,6 +14,15 @@ const MAX_FILE_BYTES = 10 * 1024 * 1024;
 /** Recebe qualquer coisa e devolve o que aquilo deveria virar. Nada é salvo como lembrete ainda. */
 export async function POST(request: Request) {
   const owner = await currentOwner();
+
+  // A trava não pode ser só de tela: sem esta checagem, quem soubesse o endereço
+  // continuaria capturando de graça pelo fetch.
+  if (deveTravar(await acessoDoDono(owner))) {
+    return NextResponse.json(
+      { error: "Seu acesso venceu. Escolha um plano para continuar mandando coisas." },
+      { status: 402 },
+    );
+  }
 
   if (!isConfigured()) {
     return NextResponse.json(

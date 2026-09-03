@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Trava } from "@/components/assinatura/trava";
 import { CalendarioClient } from "@/components/calendario/calendario-client";
 import { ChipPerfil } from "@/components/perfil/chip";
 import { AlternadorTema } from "@/components/ui/tema";
+import { acessoDoDono, deveTravar } from "@/lib/assinatura/porta";
 import { store } from "@/lib/db";
 import { currentOwner } from "@/lib/owner";
 import { ensureProfile, primeiroNome } from "@/lib/profile";
@@ -19,6 +21,7 @@ export default async function CalendarioPage() {
   const owner = await currentOwner();
   const reminders = owner.isNew ? [] : await store().listReminders(owner.id);
   const perfil = owner.authenticated ? await ensureProfile(owner.id, owner.email) : null;
+  const acesso = await acessoDoDono(owner);
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:py-10">
@@ -37,9 +40,14 @@ export default async function CalendarioPage() {
         </div>
       </header>
 
-      <h1 className="mb-4 text-2xl font-semibold tracking-tight">Seu mês</h1>
-
-      <CalendarioClient reminders={reminders} />
+      {deveTravar(acesso) ? (
+        <Trava acesso={acesso} autenticado={owner.authenticated} />
+      ) : (
+        <>
+          <h1 className="mb-4 text-2xl font-semibold tracking-tight">Seu mês</h1>
+          <CalendarioClient reminders={reminders} />
+        </>
+      )}
     </main>
   );
 }

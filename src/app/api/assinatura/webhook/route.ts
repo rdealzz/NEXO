@@ -56,7 +56,8 @@ export async function POST(request: Request) {
 
   if (CONFIRMA_PAGAMENTO.has(tipo)) {
     status = "ativa";
-    validoAte = proximoVencimento(new Date());
+    // O plano contratado é que diz quanto tempo o pagamento comprou.
+    validoAte = proximoVencimento(new Date(), assinatura.plan_id);
   } else if (PERDE_PAGAMENTO.has(tipo)) {
     // Atrasada não corta na hora: valid_until ainda manda, e o acesso cai
     // sozinho quando o período pago terminar.

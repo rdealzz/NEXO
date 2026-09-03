@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 
+import { INICIO_COOKIE, OWNER_COOKIE } from "@/lib/cookies-nomes";
 import { currentUser } from "@/lib/supabase/server";
 
 /**
@@ -10,20 +11,29 @@ import { currentUser } from "@/lib/supabase/server";
  * de criar conta. Ao entrar, `/auth/confirmar` transfere o que foi criado
  * anonimamente para a conta.
  */
-export const OWNER_COOKIE = "nexo_owner";
+export { INICIO_COOKIE, OWNER_COOKIE };
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
-export type Owner = { id: string; isNew: boolean; authenticated: boolean; email: string | null };
+export type Owner = {
+  id: string;
+  isNew: boolean;
+  authenticated: boolean;
+  email: string | null;
+  /** Início do teste grátis de quem ainda não tem conta. */
+  desde: string | null;
+};
 
 export async function currentOwner(): Promise<Owner> {
-  const user = await currentUser();
-  if (user) return { id: user.id, isNew: false, authenticated: true, email: user.email };
-
   const jar = await cookies();
+  const desde = jar.get(INICIO_COOKIE)?.value ?? null;
+
+  const user = await currentUser();
+  if (user) return { id: user.id, isNew: false, authenticated: true, email: user.email, desde };
+
   const existing = jar.get(OWNER_COOKIE)?.value;
   return existing
-    ? { id: existing, isNew: false, authenticated: false, email: null }
-    : { id: randomUUID(), isNew: true, authenticated: false, email: null };
+    ? { id: existing, isNew: false, authenticated: false, email: null, desde }
+    : { id: randomUUID(), isNew: true, authenticated: false, email: null, desde };
 }
 
 /** Id anônimo já gravado neste dispositivo, se houver. Usado só na migração. */

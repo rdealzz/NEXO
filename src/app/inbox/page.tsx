@@ -1,10 +1,12 @@
 import Link from "next/link";
 
+import { Trava } from "@/components/assinatura/trava";
 import { InboxClient } from "@/components/inbox-client";
 import { PainelNotificacoes } from "@/components/notificacoes/painel";
 import { AtivarAvisos } from "@/components/permissoes/avisos";
 import { ChipPerfil } from "@/components/perfil/chip";
 import { AlternadorTema } from "@/components/ui/tema";
+import { acessoDoDono, deveTravar } from "@/lib/assinatura/porta";
 import { store } from "@/lib/db";
 import { currentOwner } from "@/lib/owner";
 import { ensureProfile, primeiroNome } from "@/lib/profile";
@@ -20,6 +22,8 @@ export default async function InboxPage({
   const owner = await currentOwner();
   const reminders = owner.isNew ? [] : await store().listReminders(owner.id);
   const perfil = owner.authenticated ? await ensureProfile(owner.id, owner.email) : null;
+  const acesso = await acessoDoDono(owner);
+  const travado = deveTravar(acesso);
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:py-10">
@@ -55,9 +59,26 @@ export default async function InboxPage({
         </p>
       )}
 
-      <AtivarAvisos chavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} compacto />
+      {travado ? (
+        <Trava acesso={acesso} autenticado={owner.authenticated} />
+      ) : (
+        <>
+          {acesso.emTeste && acesso.liberado && (
+            <p className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-accent-soft px-4 py-3 text-sm text-accent">
+              <span className="font-medium">
+                Teste grátis: {acesso.diasRestantes === 1 ? "último dia" : `${acesso.diasRestantes} dias restantes`}.
+              </span>
+              <Link href="/perfil#plano" className="underline underline-offset-4">
+                Ver os planos
+              </Link>
+            </p>
+          )}
 
-      <InboxClient initialReminders={reminders} />
+          <AtivarAvisos chavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} compacto />
+
+          <InboxClient initialReminders={reminders} />
+        </>
+      )}
     </main>
   );
 }

@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 
-import { BotaoAssinar } from "@/components/assinatura/botao-assinar";
+import { Planos } from "@/components/assinatura/planos";
 import { Botao } from "@/components/ui/button";
 import type { Acesso } from "@/lib/assinatura/acesso";
-import { brl, PLANO } from "@/lib/pricing";
 
 const ROTULO: Record<Acesso["status"], string> = {
   sem_assinatura: "Você ainda não assinou",
+  teste: "Teste grátis",
+  vitalicio: "Acesso vitalício",
   pendente: "Pagamento pendente",
   ativa: "Assinatura ativa",
   atrasada: "Pagamento em atraso",
@@ -55,6 +56,12 @@ export function PainelAssinatura({ acesso, disponivel }: { acesso: Acesso; dispo
         </p>
       )}
 
+      {estado.emTeste && estado.liberado && ate && (
+        <p className="mt-2 rounded-xl bg-accent-soft px-3 py-2 text-sm">
+          Seu teste grátis vale até {ate}. Depois disso o app trava até você escolher um plano.
+        </p>
+      )}
+
       {estado.status === "cancelada" && estado.liberado && ate && (
         <p className="mt-2 rounded-xl bg-accent-soft px-3 py-2 text-sm">
           Cancelada — e tudo continua funcionando até {ate}, que é o período que você já pagou.
@@ -67,14 +74,7 @@ export function PainelAssinatura({ acesso, disponivel }: { acesso: Acesso; dispo
             {cancelando ? "Cancelando…" : "Cancelar assinatura"}
           </Botao>
         ) : disponivel ? (
-          <BotaoAssinar
-            autenticado
-            rotulo={
-              estado.status === "pendente"
-                ? "Continuar o pagamento"
-                : `Assinar por ${brl(PLANO.precoMensal)}/mês`
-            }
-          />
+          <Planos autenticado />
         ) : (
           <p className="text-xs text-muted">
             Pagamento ainda não configurado neste ambiente (falta{" "}
