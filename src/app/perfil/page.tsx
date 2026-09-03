@@ -201,7 +201,7 @@ function Secao({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-4 rounded-2xl border border-line bg-surface p-4">
+    <section className="cartao mt-4 p-4">
       <h2 className="text-sm font-semibold">{titulo}</h2>
       {descricao && <p className="mt-1 text-sm text-muted">{descricao}</p>}
       {children}

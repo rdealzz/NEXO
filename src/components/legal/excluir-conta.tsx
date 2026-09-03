@@ -111,7 +111,7 @@ export function ExcluirConta({ email }: { email: string | null }) {
               value={confirmacao}
               onChange={(evento) => setConfirmacao(evento.target.value.toUpperCase())}
               autoComplete="off"
-              className="mt-2 w-full rounded-xl border border-line bg-surface px-4 py-3 font-mono outline-none focus:border-danger"
+              className="campo mt-2 font-mono"
             />
 
             {erro && <p className="mt-3 text-sm text-danger">{erro}</p>}

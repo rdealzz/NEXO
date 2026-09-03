@@ -67,7 +67,7 @@ export function Identidade({
               onChange={(evento) => setNome(evento.target.value)}
               placeholder="Seu nome"
               maxLength={40}
-              className="min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+              className="min-w-0 flex-1 campo campo--sm"
             />
             <Botao
               size="sm"

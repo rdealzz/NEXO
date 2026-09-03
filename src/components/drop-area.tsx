@@ -175,16 +175,19 @@ export function DropArea({ busy, onCapture }: Props) {
         if (file) setPending(file);
       }}
       /*
-       * O campo é o elemento mais importante do app, e por isso ele é o único
-       * que muda de estado sozinho: ganha foco e cresce um pouco; enquanto o
-       * NEXO lê o material, uma luz percorre a borda. Quem está esperando vê
-       * onde a espera acontece.
+       * O campo é o elemento mais importante do app: é por ele que tudo entra.
+       * Por isso ele é o cartão mais alto da tela, e o único que muda de estado
+       * sozinho — foco, leitura, arraste.
+       *
+       * O tracejado era o estado normal, e fazia o coração do produto parecer
+       * uma caixa de "solte o arquivo aqui". Agora ele aparece só enquanto algo
+       * está sendo arrastado, que é quando ele significa alguma coisa.
        */
-      className={`campo-vivo rounded-2xl border-2 border-dashed p-4 sm:p-5 ${
-        dragging ? "border-accent bg-accent-soft" : "border-line bg-surface"
+      className={`campo-vivo cartao cartao--alto p-4 sm:p-5 ${
+        dragging ? "border-dashed border-accent bg-accent-soft" : ""
       } ${busy ? "campo-vivo--lendo" : ""}`}
     >
-      <label htmlFor="nexo-drop" className="block text-sm font-medium text-muted">
+      <label htmlFor="nexo-drop" className="rotulo">
         O que você não quer esquecer?
       </label>
 
@@ -198,7 +201,7 @@ export function DropArea({ busy, onCapture }: Props) {
         rows={3}
         disabled={busy}
         placeholder="Escreva, cole um print, arraste um boleto. Ou fale."
-        className="mt-2 w-full resize-none bg-transparent text-base outline-none placeholder:text-muted/60 disabled:opacity-50"
+        className="w-full resize-none bg-transparent text-base leading-snug outline-none placeholder:text-muted/60 disabled:opacity-50"
       />
 
       {pending && (
@@ -224,7 +227,7 @@ export function DropArea({ busy, onCapture }: Props) {
         importante da tela e o mais fácil de alcançar com o polegar. A partir do
         sm tudo volta para uma linha só, com o Mandar à direita.
       */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3 sm:flex-row sm:flex-wrap sm:items-center">
         <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-2">
           <ToolButton onClick={pedirCamera} disabled={busy}>
             Câmera

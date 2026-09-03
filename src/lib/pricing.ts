@@ -39,7 +39,7 @@ export const PLANOS: Plano[] = [
   {
     id: "anual",
     nome: "1 ano",
-    preco: 149.9,
+    preco: 129.9,
     meses: 12,
     ciclo: "YEARLY",
     chamada: "O ano fechado — e o preço por mês que não sobe mais.",

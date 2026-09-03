@@ -13,7 +13,7 @@
 export function Pensando() {
   return (
     <section
-      className="rounded-2xl border border-line bg-surface p-4 sm:p-5"
+      className="cartao p-4 sm:p-5"
       role="status"
       aria-live="polite"
       aria-label="Lendo o que você mandou"

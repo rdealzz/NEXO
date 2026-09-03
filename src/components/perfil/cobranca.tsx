@@ -171,7 +171,7 @@ function Campo({
         value={valor}
         onChange={(evento) => onChange(evento.target.value)}
         onBlur={onBlur}
-        className="mt-1 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+        className="campo campo--sm mt-1"
         {...resto}
       />
     </label>

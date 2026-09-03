@@ -13,6 +13,25 @@ import { ensureProfile, primeiroNome } from "@/lib/profile";
 
 export const dynamic = "force-dynamic";
 
+/** O mês, em traço, no mesmo peso dos outros ícones do cabeçalho. */
+function IconeCalendario() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-[1.15em]"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3.2" y="4.8" width="17.6" height="16" rx="3" />
+      <path d="M8 3.2v3.2M16 3.2v3.2M3.2 10h17.6" />
+    </svg>
+  );
+}
+
 export default async function InboxPage({
   searchParams,
 }: {
@@ -34,9 +53,17 @@ export default async function InboxPage({
           semente={owner.id}
           autenticado={owner.authenticated}
         />
-        <div className="flex shrink-0 items-center gap-3">
-          <Link href="/calendario" className="text-sm text-muted hover:text-foreground">
-            Calendário
+        {/* Três ações do mesmo tipo, três peças do mesmo tipo: "Calendário" era
+            texto solto no meio de dois botões redondos, e por isso o cabeçalho
+            parecia montado às pressas. */}
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/calendario"
+            aria-label="Calendário"
+            title="Calendário"
+            className="btn btn--surface btn--icon"
+          >
+            <IconeCalendario />
           </Link>
           <PainelNotificacoes reminders={reminders} />
           <AlternadorTema />

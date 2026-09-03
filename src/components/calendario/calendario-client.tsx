@@ -43,7 +43,7 @@ export function CalendarioClient({ reminders }: { reminders: Reminder[] }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-center rounded-2xl border border-line bg-surface p-2">
+      <div className="cartao flex justify-center p-2">
         <Calendar
           mode="single"
           selected={selecionado}
@@ -66,13 +66,11 @@ export function CalendarioClient({ reminders }: { reminders: Reminder[] }) {
         </h2>
 
         {doDia.length === 0 ? (
-          <p className="mt-3 rounded-2xl border border-dashed border-line px-4 py-8 text-center text-sm text-muted">
-            Nada marcado para este dia.
-          </p>
+          <p className="mt-3 px-4 py-10 text-center text-sm text-muted">Nada marcado para este dia.</p>
         ) : (
           <ul className="entra-em-cascata mt-3 space-y-2">
             {doDia.map((lembrete) => (
-              <li key={lembrete.id} className="peca flex gap-3 rounded-xl border border-line bg-surface p-3">
+              <li key={lembrete.id} className="peca cartao flex gap-3 p-3">
                 <span
                   aria-hidden
                   className="mt-1.5 size-2.5 shrink-0 rounded-full"

@@ -71,18 +71,25 @@ export default async function EntrarPage({
   const configurado = authConfigured();
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-16">
-      <header className="flex items-center justify-between gap-4">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-10 sm:py-16">
+      <header className="mb-6 flex items-center justify-between gap-4">
         <Link href="/" aria-label="NEXO" className="inline-flex">
           <MarcaNexo simbolo="size-8" wordmark="h-4" />
         </Link>
         <AlternadorTema />
       </header>
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight">Entrar</h1>
-      <p className="mt-2 text-muted">
-        Sem senha. Você recebe um link por e-mail e pronto. O que você já jogou aqui neste aparelho vai junto para a
-        sua conta.
-      </p>
+
+      {/*
+        Uma coluna solta no meio do branco parecia formulário de cadastro. O
+        conteúdo agora mora num cartão elevado: a página é o fundo, o cartão é
+        a camada de cima, e a hierarquia sai da profundidade — que é o único
+        recurso que sobra quando existe uma cor de fundo só.
+      */}
+      <section className="cartao cartao--alto p-6 sm:p-7">
+        <h1 className="text-3xl font-semibold tracking-tight">Entrar</h1>
+        <p className="mt-2 text-[0.9375rem] leading-snug text-muted">
+          Sem senha. Você recebe um link por e-mail e pronto. O que já jogou aqui neste aparelho vai junto.
+        </p>
 
       {!configurado && (
         <div className="mt-6 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
@@ -111,7 +118,7 @@ export default async function EntrarPage({
             autoComplete="email"
             placeholder="voce@email.com"
             disabled={!configurado}
-            className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent disabled:opacity-50"
+            className="campo"
           />
           <Botao type="submit" variant="primary" size="lg" block disabled={!configurado}>
             Me manda o link
@@ -147,7 +154,7 @@ export default async function EntrarPage({
                 required
                 autoComplete="email"
                 placeholder="voce@email.com"
-                className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent"
+                className="campo"
               />
               <input
                 type="password"
@@ -157,7 +164,7 @@ export default async function EntrarPage({
                 autoComplete="current-password"
                 placeholder="senha (mínimo 8 caracteres)"
                 disabled={!configurado}
-                className="w-full rounded-xl border border-line bg-surface px-4 py-3 outline-none focus:border-accent disabled:opacity-50"
+                className="campo"
               />
               <Botao type="submit" variant="surface" size="lg" block disabled={!configurado}>
                 Entrar ou criar conta
@@ -167,7 +174,20 @@ export default async function EntrarPage({
         </>
       )}
 
-      {erro && <p className="mt-4 text-sm text-danger">{ERROS[erro] ?? "Algo deu errado."}</p>}
+        {erro && <p className="mt-4 text-sm text-danger">{ERROS[erro] ?? "Algo deu errado."}</p>}
+      </section>
+
+      <p className="mt-5 text-center text-xs text-muted">
+        Ao entrar você aceita os{" "}
+        <Link href="/legal/termos" className="underline underline-offset-4 hover:text-foreground">
+          Termos
+        </Link>{" "}
+        e a{" "}
+        <Link href="/legal/privacidade" className="underline underline-offset-4 hover:text-foreground">
+          Política de Privacidade
+        </Link>
+        .
+      </p>
     </main>
   );
 }

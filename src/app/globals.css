@@ -506,12 +506,21 @@ body {
   outline-offset: 3px;
 }
 
+/*
+ * Desabilitado continua sendo uma peça — só desligada. Zerar o relevo e cair
+ * para 40% de opacidade transformava o botão principal numa pílula chapada, que
+ * é exatamente o que fazia a tela de entrar parecer um formulário qualquer.
+ * Aqui ele perde saturação e altura, e mantém a base: dá para ver que é o mesmo
+ * objeto, apenas fora de alcance.
+ */
 .btn:disabled,
 .btn[aria-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.4;
+  --btn-altura: 1px;
+  --luz-op: 0;
+  opacity: 0.62;
+  filter: saturate(0.7);
   transform: none;
-  box-shadow: inset 0 1px 0 var(--btn-gloss);
 }
 
 /* Interruptor ligado: fica afundado, como tecla presa. */
@@ -522,9 +531,17 @@ body {
 }
 
 /* --- Variantes ---------------------------------------------------------- */
+/*
+ * O primário é a peça mais sólida da tela, e ganha duas camadas a mais: um
+ * brilho de topo mais forte, que é onde a luz bate numa superfície curva, e uma
+ * sombra projetada da própria cor — objeto colorido tinge a sombra que faz, e é
+ * isso que separa um botão de um retângulo pintado.
+ */
 .btn--primary {
   --btn-face: var(--accent);
   --btn-ink: var(--btn-primary-ink);
+  --btn-gloss: rgb(255 255 255 / 0.28);
+  --btn-cast: color-mix(in oklab, var(--accent) 45%, transparent);
 }
 
 .btn--surface {
@@ -542,6 +559,95 @@ body {
 .btn--danger {
   --btn-face: var(--danger);
   --btn-ink: #ffffff;
+}
+
+/* ---------------------------------------------------------------------------
+   Campos
+   ---------------------------------------------------------------------------
+   O contrário do botão, e de propósito: botão sai da superfície, campo entra
+   nela. É a mesma lógica física — a luz que bate no topo de uma peça saliente
+   bate no fundo de uma cavidade — e é o que faz um formulário parecer parte do
+   mesmo material em vez de um retângulo com contorno.
+
+   Uma classe só, `.campo`, para os quinze campos do app: antes cada tela
+   repetia a mesma corrente de classes do Tailwind, e nenhuma delas tinha
+   profundidade.
+--------------------------------------------------------------------------- */
+.campo {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  padding: 0.72rem 0.95rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--foreground);
+  background: var(--background);
+  /* A cavidade: sombra interna no topo, luz interna embaixo. */
+  box-shadow:
+    inset 0 2px 3px -1px var(--btn-shade),
+    inset 0 -1px 0 var(--btn-gloss);
+  outline: none;
+  transition:
+    border-color var(--mov-rapido) var(--curva-entrada),
+    box-shadow var(--mov-rapido) var(--curva-entrada);
+}
+
+.campo::placeholder {
+  color: var(--muted);
+  opacity: 0.65;
+}
+
+/* Focado, a cavidade ganha um halo da cor de ação — o app está ouvindo. */
+.campo:focus {
+  border-color: color-mix(in oklab, var(--accent) 60%, transparent);
+  box-shadow:
+    inset 0 2px 3px -1px var(--btn-shade),
+    inset 0 -1px 0 var(--btn-gloss),
+    0 0 0 4px color-mix(in oklab, var(--accent) 14%, transparent);
+}
+
+.campo:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.campo--sm {
+  border-radius: 0.7rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.9375rem;
+}
+
+/* Rótulo de campo: a mesma medida em toda tela. */
+.rotulo {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------------------
+   Cartões
+   ---------------------------------------------------------------------------
+   Com fundo de uma cor só, o que dá hierarquia é a elevação, não a cor. Três
+   níveis, e cada um diz uma coisa diferente: `.cartao` é conteúdo apoiado na
+   página, `.cartao--alto` é o bloco que a tela quer que você olhe primeiro, e
+   o contorno sozinho continua servindo para o que é secundário.
+--------------------------------------------------------------------------- */
+.cartao {
+  border: 1px solid var(--border);
+  border-radius: 1.15rem;
+  background: var(--surface);
+  box-shadow:
+    0 1px 2px -1px var(--btn-cast),
+    0 4px 12px -6px var(--btn-cast);
+}
+
+.cartao--alto {
+  box-shadow:
+    inset 0 1px 0 var(--btn-gloss),
+    0 2px 4px -2px var(--btn-cast),
+    0 12px 32px -12px var(--btn-cast);
 }
 
 /* Botão de texto: sem peça, sem relevo — a cor faz o trabalho. */

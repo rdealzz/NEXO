@@ -60,9 +60,7 @@ export function ReminderList({ aba, reminders, onComplete, onSnooze, onSchedule,
 
   if (visiveis.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-line px-4 py-10 text-center text-sm text-muted">
-        {VAZIO[aba]}
-      </p>
+      <p className="px-4 py-12 text-center text-sm text-muted">{VAZIO[aba]}</p>
     );
   }
 
@@ -150,7 +148,7 @@ function Item({
 
   return (
     <li
-      className={`peca relative overflow-hidden rounded-xl border border-line bg-surface p-3 ${
+      className={`peca cartao relative overflow-hidden p-3 ${
         saindo ? "dissolvendo" : ""
       }`}
       onPointerDown={tocarInicio}

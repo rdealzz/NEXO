@@ -21,7 +21,7 @@ export function Trava({ acesso, autenticado }: { acesso: Acesso; autenticado: bo
   const acabouOTeste = acesso.emTeste;
 
   return (
-    <section className="rounded-3xl border border-line bg-surface p-5 sm:p-7">
+    <section className="cartao cartao--alto p-5 sm:p-7">
       <p className="inline-flex rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent">
         {acabouOTeste ? `Seus ${TESTE_DIAS} dias de teste acabaram` : "Seu acesso venceu"}
       </p>

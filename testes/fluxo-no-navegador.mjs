@@ -204,9 +204,9 @@ console.log('\n6. Os três planos e o desconto');
   const texto = (await p.locator('body').innerText()).replace(/\u00a0/g, ' ');
   conferir(texto.includes('R$ 19,90'), 'mensal a R$ 19,90');
   conferir(texto.includes('R$ 13,30'), 'trimestral mostra o preço por mês (R$ 13,30)');
-  conferir(texto.includes('R$ 12,49'), 'anual mostra o preço por mês (R$ 12,49)');
-  conferir(texto.includes('R$ 88,90'), 'a economia do anual aparece em reais');
-  conferir(texto.includes('37%'), 'o desconto do anual aparece em porcentagem');
+  conferir(texto.includes('R$ 10,83'), 'anual mostra o preço por mês (R$ 10,83)');
+  conferir(texto.includes('R$ 108,90'), 'a economia do anual aparece em reais');
+  conferir(texto.includes('46%'), 'o desconto do anual aparece em porcentagem');
   conferir(texto.includes('Melhor preço') || texto.includes('MELHOR PREÇO'), 'o anual é destacado');
 
   // Trocar de plano muda o botão de assinar.

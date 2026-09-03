@@ -137,7 +137,7 @@ export function ChipPerfil({
           {nome}
         </Link>
       ) : (
-        <Link href="/entrar" className="btn btn--surface btn--sm">
+        <Link href="/entrar" className="btn btn--soft btn--chip">
           Entrar
         </Link>
       )}

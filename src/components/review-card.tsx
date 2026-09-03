@@ -85,7 +85,7 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
   const compra = analysis.purchase;
 
   return (
-    <section className="rounded-2xl border border-line bg-surface p-4 sm:p-5">
+    <section className="cartao cartao--alto p-4 sm:p-5">
       <header className="flex items-start gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-accent">Encontrei algo importante</p>
@@ -136,7 +136,7 @@ export function ReviewCard({ captureId, analysis, followUps, saving, onConfirm, 
               value={answer}
               onChange={(event) => setAnswer(event.target.value)}
               placeholder="ex.: dia 20, de manhã"
-              className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none"
+              className="min-w-0 flex-1 campo campo--sm"
             />
             <Botao type="submit" variant="primary" size="sm" disabled={!answer.trim() || saving}>
               Responder

@@ -19,7 +19,7 @@ export function Paywall({ economia, autenticado = false }: { economia: number; a
   const paga = economia >= PRECO_ANUAL;
 
   return (
-    <section className="rounded-3xl border border-line bg-surface p-6 sm:p-8">
+    <section className="cartao cartao--alto p-6 sm:p-8">
       {paga && (
         <p className="mb-4 inline-flex rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent">
           Pelo que você marcou, o NEXO se paga {(economia / PRECO_ANUAL).toFixed(1).replace(".", ",")}× no ano

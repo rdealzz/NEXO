@@ -109,7 +109,7 @@ export default async function ConfiguracoesPage({
               name="code"
               inputMode="numeric"
               placeholder="código de 6 dígitos"
-              className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none"
+              className="min-w-0 flex-1 campo campo--sm"
             />
             <Botao type="submit" variant="primary" size="sm">
               Confirmar
@@ -121,7 +121,7 @@ export default async function ConfiguracoesPage({
               name="phone"
               inputMode="tel"
               placeholder="55 11 90000-0000"
-              className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none"
+              className="min-w-0 flex-1 campo campo--sm"
             />
             <Botao type="submit" variant="primary" size="sm">
               Vincular
