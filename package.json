@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-strip-types --import ./scripts/test-resolver.mjs --test 'src/**/*.test.ts'",
-    "chaves:push": "node scripts/gerar-chaves-push.mjs"
+    "chaves:push": "node scripts/gerar-chaves-push.mjs",
+    "teste:navegador": "node testes/fluxo-no-navegador.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",
